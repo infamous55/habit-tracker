@@ -16,10 +16,7 @@ resolver:
   filename_template: '{name}.resolvers.go'
   omit_template_comment: true
 
-# Optional: turn on use ` + "`" + `gqlgen:"fieldName"` + "`" + ` tags in your models
-# struct_tag: json
-
-omit_gqlgen_file_notice: false
+omit_gqlgen_file_notice: true
 
 autobind:
   - 'github.com/infamous55/habit-tracker/internal/models'
