@@ -1,0 +1,144 @@
+type User {
+  id: ID!
+  name: String!
+  email: String!
+  password: String!
+  groups: [Group!]!
+  habits: [Habit!]!
+}
+
+type Group {
+  id: ID!
+  name: String!
+  description: String
+  habits: [Habit!]!
+  user: User!
+}
+
+type Habit {
+  id: ID!
+  name: String!
+  description: String
+  schedule: Schedule!
+  successes: [Success!]!
+  group: Group!
+  user: User!
+}
+
+type Schedule {
+  type: ScheduleType!
+  weekdays: [Weekday!]
+  monthdays: [Int!]
+  repeatInterval: Int
+  repeatUnit: RepeatUnit
+  start: String!
+}
+
+enum ScheduleType {
+  WEEKLY
+  MONTHLY
+  PERIODIC
+}
+
+enum Weekday {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+enum RepeatUnit {
+  DAY
+  WEEK
+  MONTH
+}
+
+type Success {
+  id: ID!
+  date: String!
+  habit: Habit!
+}
+
+type Query {
+  getCurrentUser: User
+  getGroups: [Group!]!
+  getGroup(id: ID!): Group
+  getHabits(
+    groupId: ID
+    startDate: String
+    endDate: String
+    succeeded: Boolean
+  ): [Habit!]!
+  getHabit(id: ID!): Habit
+}
+
+input Credentials {
+  email: String!
+  password: String!
+}
+
+input RefreshTokenInput {
+  token: String!
+}
+
+input NewGroup {
+  name: String!
+  description: String
+}
+
+input GroupData {
+  id: ID!
+  name: String
+  description: String
+}
+
+input NewHabit {
+  name: String!
+  description: String
+  schedule: ScheduleInput!
+  groupId: ID!
+}
+
+input ScheduleInput {
+  type: ScheduleType!
+  weekdays: [Weekday!]
+  monthdays: [Int!]
+  repeatInterval: Int
+  repeatUnit: RepeatUnit
+  start: String!
+}
+
+input HabitData {
+  id: ID!
+  name: String
+  description: String
+  schedule: ScheduleInput
+  groupId: ID
+}
+
+input NewSuccess {
+  date: String!
+  habitId: ID!
+}
+
+type AuthData {
+  token: String!
+  user: User!
+}
+
+type Mutation {
+  register(input: Credentials!): AuthData!
+  login(input: Credentials!): AuthData!
+  refreshToken(input: RefreshTokenInput!): AuthData!
+  createGroup(input: NewGroup!): Group!
+  updateGroup(input: GroupData!): Group!
+  deleteGroup(id: ID!): Group
+  createHabit(input: NewHabit!): Habit!
+  updateHabit(input: HabitData!): Habit!
+  deleteHabit(id: ID!): Habit
+  createSuccess(input: NewSuccess!): Success!
+  deleteSuccess(id: ID!): Success
+}
