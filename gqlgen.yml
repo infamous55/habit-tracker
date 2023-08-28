@@ -1,5 +1,5 @@
 schema:
-  - internal/graphql/*.graphqls
+  - internal/graphql/*.graphql
 
 exec:
   filename: internal/graphql/generated.go
@@ -13,13 +13,13 @@ resolver:
   layout: follow-schema
   dir: internal/graphql
   package: graphql
-  filename_template: '{name}.resolvers.go'
+  filename_template: "{name}.resolvers.go"
   omit_template_comment: true
 
 omit_gqlgen_file_notice: true
 
 autobind:
-  - 'github.com/infamous55/habit-tracker/internal/models'
+  - "github.com/infamous55/habit-tracker/internal/models"
 
 models:
   ID:
