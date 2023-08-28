@@ -51,8 +51,8 @@ func Init() {
 
 	srv.AroundOperations(operationMiddleware)
 
-	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	http.Handle("/query", srv)
+	e.GET("/", echo.WrapHandler(playground.Handler("GraphQL playground", "/query")))
+	e.POST("/query", echo.WrapHandler(srv))
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))

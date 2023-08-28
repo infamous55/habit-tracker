@@ -24,7 +24,6 @@ func extractHeaders(next echo.HandlerFunc) echo.HandlerFunc {
 	}
 }
 
-// Disables introspection
 func operationMiddleware(ctx context.Context, next gqlgen.OperationHandler) gqlgen.ResponseHandler {
 	playgroundPassword, ok := ctx.Value(playgroundPasswordKey).(string)
 	if !ok || playgroundPassword != config.GetSecret("GRAPHQL_PLAYGROUND_PASSWORD") {
