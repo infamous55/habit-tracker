@@ -43,6 +43,7 @@ func Init() {
 	}
 
 	db := mongodb.Connect()
+	defer db.Disconnect()
 	c := graphql.Config{Resolvers: &graphql.Resolver{
 		Database: db,
 	}}
