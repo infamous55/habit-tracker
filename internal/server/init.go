@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/infamous55/habit-tracker/internal/mongodb"
+	"github.com/joho/godotenv"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 
@@ -30,6 +31,11 @@ func Init() {
 		AllowOrigins: []string{"*"},
 		AllowMethods: []string{http.MethodOptions, http.MethodGet, http.MethodPost},
 	}))
+
+	err := godotenv.Load()
+	if err != nil {
+		e.Logger.Fatal(err)
+	}
 
 	port := os.Getenv("PORT")
 	if port == "" {
