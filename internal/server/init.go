@@ -7,6 +7,7 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/infamous55/habit-tracker/internal/mongodb"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 
@@ -15,6 +16,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler/lru"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/infamous55/habit-tracker/internal/auth"
 	"github.com/infamous55/habit-tracker/internal/graphql"
 )
 
@@ -28,15 +30,15 @@ func Init() {
 		AllowOrigins: []string{"*"},
 		AllowMethods: []string{http.MethodOptions, http.MethodGet, http.MethodPost},
 	}))
-	e.Use(extractHeaders)
 
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = defaultPort
 	}
 
+	db := mongodb.Connect()
 	c := graphql.Config{Resolvers: &graphql.Resolver{
-		// dependency injection point
+		Database: db,
 	}}
 
 	srv := handler.NewDefaultServer(graphql.NewExecutableSchema(c))
@@ -51,8 +53,13 @@ func Init() {
 		Cache: lru.New(100),
 	})
 
-	srv.AroundOperations(operationMiddleware)
+	// conditionally disables introspection in production
+	if os.Getenv("ENVIRONMENT") == "production" {
+		e.Use(extractPlaygroundPassword)
+		srv.AroundOperations(verifyPlaygroundPassword)
+	}
 
+	e.Use(auth.ExtractUserMiddleware(db))
 	e.GET("/", echo.WrapHandler(playground.Handler("GraphQL playground", "/query")))
 	e.POST("/query", echo.WrapHandler(srv))
 
@@ -62,6 +69,7 @@ func Init() {
 		}
 	}()
 
+	// graceful shutdown
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt)
 	<-quit

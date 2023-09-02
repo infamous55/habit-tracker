@@ -71,9 +71,20 @@ func (r *queryResolver) GetHabit(ctx context.Context, id string) (*models.Habit,
 	panic(fmt.Errorf("not implemented: GetHabit - getHabit"))
 }
 
+func (r *userResolver) Groups(ctx context.Context, obj *models.User) ([]*models.Group, error) {
+	panic(fmt.Errorf("not implemented: Groups - groups"))
+}
+
+func (r *userResolver) Habits(ctx context.Context, obj *models.User) ([]*models.Habit, error) {
+	panic(fmt.Errorf("not implemented: Habits - habits"))
+}
+
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
+func (r *Resolver) User() UserResolver { return &userResolver{r} }
+
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+type userResolver struct{ *Resolver }
