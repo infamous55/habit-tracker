@@ -67,10 +67,6 @@ type NewSuccess struct {
 	HabitID string `json:"habitId"`
 }
 
-type RefreshTokenInput struct {
-	Token string `json:"token"`
-}
-
 type Schedule struct {
 	Type           ScheduleType `json:"type"`
 	Weekdays       []Weekday    `json:"weekdays,omitempty"`

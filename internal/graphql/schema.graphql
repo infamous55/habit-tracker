@@ -80,10 +80,6 @@ input Credentials {
   password: String!
 }
 
-input RefreshTokenInput {
-  token: String!
-}
-
 input NewGroup {
   name: String!
   description: String
@@ -132,7 +128,7 @@ type AuthData {
 type Mutation {
   register(input: Credentials!): AuthData!
   login(input: Credentials!): AuthData!
-  refreshToken(input: RefreshTokenInput!): AuthData!
+  refreshToken: AuthData!
   createGroup(input: NewGroup!): Group!
   updateGroup(input: GroupData!): Group!
   deleteGroup(id: ID!): Group

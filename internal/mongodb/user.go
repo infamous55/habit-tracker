@@ -23,7 +23,7 @@ func hashPassword(password string) (string, error) {
 	return string(hash), nil
 }
 
-func (db DatabaseWrapper) GetUserById(id string) (*models.User, error) {
+func (db *DatabaseWrapper) GetUserById(id string) (*models.User, error) {
 	ID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, err
@@ -42,7 +42,7 @@ func (db DatabaseWrapper) GetUserById(id string) (*models.User, error) {
 	return user, nil
 }
 
-func (db DatabaseWrapper) CreateUser(credentials models.Credentials) (*models.User, error) {
+func (db *DatabaseWrapper) CreateUser(credentials models.Credentials) (*models.User, error) {
 	_, err := mail.ParseAddress(credentials.Email)
 	if err != nil {
 		return nil, err
@@ -74,4 +74,18 @@ func (db DatabaseWrapper) CreateUser(credentials models.Credentials) (*models.Us
 
 	user.ID = oid.Hex()
 	return &user, nil
+}
+
+func (db *DatabaseWrapper) GetUserByEmail(email string) (*models.User, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	result := db.Collection("users").FindOne(ctx, bson.M{"email": email})
+
+	var user *models.User
+	err := result.Decode(&user)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
 }
