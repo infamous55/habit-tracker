@@ -22,7 +22,6 @@ func ExtractUserMiddleware(db mongodb.DatabaseWrapper) echo.MiddlewareFunc {
 			tokenString := strings.TrimPrefix(authTokenHeader, "Bearer ")
 			claims, err := ParseJWTWithCustomClaims(tokenString)
 			if err != nil {
-				fmt.Println(err)
 				return next(ctx)
 			}
 
