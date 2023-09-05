@@ -23,7 +23,7 @@ func hashPassword(password string) (string, error) {
 	return string(hash), nil
 }
 
-func (db *DatabaseWrapper) GetUserById(id string) (*models.User, error) {
+func (db *DatabaseWrapper) GetUserByID(id string) (*models.User, error) {
 	ID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, err

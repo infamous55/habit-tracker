@@ -22,10 +22,11 @@ func ExtractUserMiddleware(db mongodb.DatabaseWrapper) echo.MiddlewareFunc {
 			tokenString := strings.TrimPrefix(authTokenHeader, "Bearer ")
 			claims, err := ParseJWTWithCustomClaims(tokenString)
 			if err != nil {
+				fmt.Println(err)
 				return next(ctx)
 			}
 
-			user, err := db.GetUserById(claims.UserId)
+			user, err := db.GetUserByID(claims.UserID)
 			if err != nil {
 				return next(ctx)
 			}

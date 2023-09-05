@@ -9,7 +9,7 @@ import (
 )
 
 type CustomClaims struct {
-	UserId string `json:"userId"`
+	UserID string `json:"userID"`
 	jwt.StandardClaims
 }
 
@@ -35,9 +35,9 @@ func ParseJWTWithCustomClaims(tokenString string) (*CustomClaims, error) {
 	return claims, nil
 }
 
-func NewJWTWithCustomClaims(userId string) (string, error) {
+func NewJWTWithCustomClaims(userID string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, CustomClaims{
-		UserId: userId,
+		UserID: userID,
 		StandardClaims: jwt.StandardClaims{
 			IssuedAt:  time.Now().Unix(),
 			ExpiresAt: time.Now().Add(time.Hour * 24 * 7).Unix(),
