@@ -44,6 +44,12 @@ func Init() {
 
 	db := mongodb.Connect()
 	defer db.Disconnect()
+
+	err = db.CreateIndex("users", "email", true)
+	if err != nil {
+		e.Logger.Fatal(err)
+	}
+
 	c := graphql.Config{Resolvers: &graphql.Resolver{
 		Database: db,
 	}}
