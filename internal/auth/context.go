@@ -1,20 +1,20 @@
 package auth
 
 import (
-	"context"
-	"errors"
+	"fmt"
 
 	"github.com/infamous55/habit-tracker/internal/models"
+	"github.com/labstack/echo"
 )
 
-func ExtractUserFromContext(ctx context.Context) (*models.User, error) {
-	err := errors.New("no user in context")
+func ExtractUserFromEchoContext(ctx echo.Context) (*models.User, error) {
+	err := fmt.Errorf("no user in context")
 
-	if ctx.Value(userKey) == nil {
+	if ctx.Get(userKey) == nil {
 		return nil, err
 	}
 
-	user, ok := ctx.Value(userKey).(*models.User)
+	user, ok := ctx.Get(userKey).(*models.User)
 	if !ok {
 		return nil, err
 	}

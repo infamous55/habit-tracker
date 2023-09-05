@@ -7,6 +7,7 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/infamous55/habit-tracker/internal/ctxbridge"
 	"github.com/infamous55/habit-tracker/internal/mongodb"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo"
@@ -72,6 +73,7 @@ func Init() {
 		srv.AroundOperations(verifyPlaygroundPassword)
 	}
 
+	e.Use(ctxbridge.EchoContextToContext)
 	e.Use(auth.ExtractUserMiddleware(db))
 	e.GET("/", echo.WrapHandler(playground.Handler("GraphQL playground", "/query")))
 	e.POST("/query", echo.WrapHandler(srv))

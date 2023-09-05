@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/infamous55/habit-tracker/internal/auth"
+	"github.com/infamous55/habit-tracker/internal/ctxbridge"
 	"github.com/infamous55/habit-tracker/internal/models"
 )
 
@@ -53,7 +54,12 @@ func (r *mutationResolver) Login(
 }
 
 func (r *mutationResolver) RefreshToken(ctx context.Context) (*models.AuthData, error) {
-	user, err := auth.ExtractUserFromContext(ctx)
+	ec, err := ctxbridge.EchoContextFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	user, err := auth.ExtractUserFromEchoContext(ec)
 	if err != nil {
 		return nil, err
 	}
