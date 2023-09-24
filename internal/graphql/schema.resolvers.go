@@ -7,6 +7,33 @@ import (
 	"github.com/infamous55/habit-tracker/internal/models"
 )
 
+func (r *groupResolver) Habits(ctx context.Context, obj *models.Group) ([]*models.Habit, error) {
+	panic(fmt.Errorf("not implemented: Habits - habits"))
+}
+
+func (r *groupResolver) User(ctx context.Context, obj *models.Group) (*models.User, error) {
+	panic(fmt.Errorf("not implemented: User - user"))
+}
+
+func (r *habitResolver) Schedule(ctx context.Context, obj *models.Habit) (*models.Schedule, error) {
+	panic(fmt.Errorf("not implemented: Schedule - schedule"))
+}
+
+func (r *habitResolver) Successes(
+	ctx context.Context,
+	obj *models.Habit,
+) ([]*models.Success, error) {
+	panic(fmt.Errorf("not implemented: Successes - successes"))
+}
+
+func (r *habitResolver) Group(ctx context.Context, obj *models.Habit) (*models.Group, error) {
+	panic(fmt.Errorf("not implemented: Group - group"))
+}
+
+func (r *habitResolver) User(ctx context.Context, obj *models.Habit) (*models.User, error) {
+	panic(fmt.Errorf("not implemented: User - user"))
+}
+
 func (r *mutationResolver) CreateGroup(
 	ctx context.Context,
 	input models.NewGroup,
@@ -54,10 +81,6 @@ func (r *mutationResolver) DeleteSuccess(ctx context.Context, id string) (*model
 	panic(fmt.Errorf("not implemented: DeleteSuccess - deleteSuccess"))
 }
 
-func (r *queryResolver) GetCurrentUser(ctx context.Context) (*models.User, error) {
-	panic(fmt.Errorf("not implemented: GetCurrentUser - getCurrentUser"))
-}
-
 func (r *queryResolver) GetGroups(ctx context.Context) ([]*models.Group, error) {
 	panic(fmt.Errorf("not implemented: GetGroups - getGroups"))
 }
@@ -80,22 +103,17 @@ func (r *queryResolver) GetHabit(ctx context.Context, id string) (*models.Habit,
 	panic(fmt.Errorf("not implemented: GetHabit - getHabit"))
 }
 
-func (r *userResolver) Groups(ctx context.Context, obj *models.User) ([]*models.Group, error) {
-	panic(fmt.Errorf("not implemented: Groups - groups"))
-}
+func (r *Resolver) Group() GroupResolver { return &groupResolver{r} }
 
-func (r *userResolver) Habits(ctx context.Context, obj *models.User) ([]*models.Habit, error) {
-	panic(fmt.Errorf("not implemented: Habits - habits"))
-}
+func (r *Resolver) Habit() HabitResolver { return &habitResolver{r} }
 
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
-func (r *Resolver) User() UserResolver { return &userResolver{r} }
-
 type (
+	groupResolver    struct{ *Resolver }
+	habitResolver    struct{ *Resolver }
 	mutationResolver struct{ *Resolver }
 	queryResolver    struct{ *Resolver }
-	userResolver     struct{ *Resolver }
 )

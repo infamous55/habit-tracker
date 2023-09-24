@@ -18,28 +18,10 @@ type Credentials struct {
 	Password string `json:"password"`
 }
 
-type Group struct {
-	ID          string   `json:"id"`
-	Name        string   `json:"name"`
-	Description *string  `json:"description,omitempty"`
-	Habits      []*Habit `json:"habits"`
-	User        *User    `json:"user"`
-}
-
 type GroupData struct {
 	ID          string  `json:"id"`
 	Name        *string `json:"name,omitempty"`
 	Description *string `json:"description,omitempty"`
-}
-
-type Habit struct {
-	ID          string     `json:"id"`
-	Name        string     `json:"name"`
-	Description *string    `json:"description,omitempty"`
-	Schedule    *Schedule  `json:"schedule"`
-	Successes   []*Success `json:"successes"`
-	Group       *Group     `json:"group"`
-	User        *User      `json:"user"`
 }
 
 type HabitData struct {
