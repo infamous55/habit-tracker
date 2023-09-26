@@ -7,20 +7,39 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/infamous55/habit-tracker/internal/ctxbridge"
-	"github.com/infamous55/habit-tracker/internal/mongodb"
-	"github.com/joho/godotenv"
-	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
-
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
 	"github.com/99designs/gqlgen/graphql/handler/lru"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/joho/godotenv"
+	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
+
 	"github.com/infamous55/habit-tracker/internal/auth"
+	"github.com/infamous55/habit-tracker/internal/ctxbridge"
 	"github.com/infamous55/habit-tracker/internal/graphql"
+	"github.com/infamous55/habit-tracker/internal/mongodb"
 )
+
+func setupIndexes(db mongodb.DatabaseWrapper) error {
+	err := db.CreateIndex("users", "email", true)
+	if err != nil {
+		return err
+	}
+
+	err = db.CreateIndex("groups", "user_id", false)
+	if err != nil {
+		return err
+	}
+
+	err = db.CreateIndex("habits", "user_id", false)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
 
 const defaultPort = "8080"
 
@@ -46,7 +65,7 @@ func Init() {
 	db := mongodb.Connect()
 	defer db.Disconnect()
 
-	err = db.CreateIndex("users", "email", true)
+	err = setupIndexes(db)
 	if err != nil {
 		e.Logger.Fatal(err)
 	}
@@ -67,7 +86,7 @@ func Init() {
 		Cache: lru.New(100),
 	})
 
-	// conditionally disables introspection in production
+	// conditionally disable introspection in production
 	if os.Getenv("ENVIRONMENT") == "production" {
 		e.Use(extractPlaygroundPassword)
 		srv.AroundOperations(verifyPlaygroundPassword)
