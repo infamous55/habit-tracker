@@ -14,6 +14,7 @@ func (db *DatabaseWrapper) GetGroupsByUserID(userID string) ([]*models.Group, er
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
+	// TODO: change the user_id property type after implementing foreign keys
 	cur, err := db.Collection("groups").Find(ctx, bson.M{"user_id": userID})
 	if err != nil {
 		return nil, err
@@ -47,7 +48,7 @@ func (db *DatabaseWrapper) GetGroupByID(id string) (*models.Group, error) {
 	return group, nil
 }
 
-func (db *DatabaseWrapper) CreateGroup(data models.Group) (*models.Group, error) {
+func (db *DatabaseWrapper) CreateGroup(data models.NewGroup) (*models.Group, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -90,12 +91,18 @@ func (db *DatabaseWrapper) UpdateGroup(data models.GroupData) (*models.Group, er
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	_, err = db.Collection("groups").UpdateOne(ctx, filter, update)
+	result := db.Collection("groups").FindOneAndUpdate(ctx, filter, update)
+	err = result.Err()
 	if err != nil {
 		return nil, err
 	}
 
-	return db.GetGroupByID(data.ID)
+	var updatedGroup models.Group
+	err = result.Decode(&updatedGroup)
+	if err != nil {
+		return nil, err
+	}
+	return &updatedGroup, nil
 }
 
 func (db *DatabaseWrapper) DeleteGroupByID(id string) (*models.Group, error) {

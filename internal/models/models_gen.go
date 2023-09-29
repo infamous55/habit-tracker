@@ -32,11 +32,6 @@ type HabitData struct {
 	GroupID     *string        `json:"groupId,omitempty"`
 }
 
-type NewGroup struct {
-	Name        string  `json:"name"`
-	Description *string `json:"description,omitempty"`
-}
-
 type NewHabit struct {
 	Name        string         `json:"name"`
 	Description *string        `json:"description,omitempty"`

@@ -51,12 +51,8 @@ func (r *mutationResolver) CreateGroup(
 		return nil, err
 	}
 
-	data := models.Group{
-		Name:        input.Name,
-		Description: input.Description,
-		UserID:      user.ID,
-	}
-	return r.Database.CreateGroup(data)
+	input.UserID = user.ID
+	return r.Database.CreateGroup(input)
 }
 
 func (r *mutationResolver) UpdateGroup(

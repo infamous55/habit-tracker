@@ -6,3 +6,9 @@ type Group struct {
 	Description *string `json:"description,omitempty" bson:"description,omitempty"`
 	UserID      string  `json:"user_id"               bson:"user_id"`
 }
+
+type NewGroup struct {
+	Name        string  `json:"name"                  bson:"name"`
+	Description *string `json:"description,omitempty" bson:"description,omitempty"`
+	UserID      string  `json:"user_id"               bson:"user_id"`
+}
