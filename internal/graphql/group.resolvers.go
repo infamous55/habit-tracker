@@ -4,18 +4,14 @@ import (
 	"context"
 	"fmt"
 
+	"go.mongodb.org/mongo-driver/bson/primitive"
+
 	"github.com/infamous55/habit-tracker/internal/auth"
-	"github.com/infamous55/habit-tracker/internal/ctxbridge"
 	"github.com/infamous55/habit-tracker/internal/models"
 )
 
 func (r *queryResolver) GetGroups(ctx context.Context) ([]*models.Group, error) {
-	ec, err := ctxbridge.EchoContextFromContext(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	user, err := auth.ExtractUserFromEchoContext(ec)
+	user, err := auth.ExtractUserFromContext(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -24,29 +20,24 @@ func (r *queryResolver) GetGroups(ctx context.Context) ([]*models.Group, error) 
 }
 
 func (r *queryResolver) GetGroup(ctx context.Context, id string) (*models.Group, error) {
-	ec, err := ctxbridge.EchoContextFromContext(ctx)
+	_, err := auth.ExtractUserFromContext(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	_, err = auth.ExtractUserFromEchoContext(ec)
+	groupID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, err
 	}
 
-	return r.Database.GetGroupByID(id)
+	return r.Database.GetGroupByID(groupID)
 }
 
 func (r *mutationResolver) CreateGroup(
 	ctx context.Context,
 	input models.NewGroup,
 ) (*models.Group, error) {
-	ec, err := ctxbridge.EchoContextFromContext(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	user, err := auth.ExtractUserFromEchoContext(ec)
+	user, err := auth.ExtractUserFromContext(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -59,17 +50,17 @@ func (r *mutationResolver) UpdateGroup(
 	ctx context.Context,
 	input models.GroupData,
 ) (*models.Group, error) {
-	ec, err := ctxbridge.EchoContextFromContext(ctx)
+	user, err := auth.ExtractUserFromContext(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	user, err := auth.ExtractUserFromEchoContext(ec)
+	groupID, err := primitive.ObjectIDFromHex(input.ID)
 	if err != nil {
 		return nil, err
 	}
 
-	group, err := r.Database.GetGroupByID(input.ID)
+	group, err := r.Database.GetGroupByID(groupID)
 	if err != nil {
 		return nil, err
 	}
@@ -78,21 +69,22 @@ func (r *mutationResolver) UpdateGroup(
 		return nil, fmt.Errorf("permission denied")
 	}
 
+	// this is the only place where the group id is of type string
 	return r.Database.UpdateGroup(input)
 }
 
 func (r *mutationResolver) DeleteGroup(ctx context.Context, id string) (*models.Group, error) {
-	ec, err := ctxbridge.EchoContextFromContext(ctx)
+	user, err := auth.ExtractUserFromContext(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	user, err := auth.ExtractUserFromEchoContext(ec)
+	groupID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, err
 	}
 
-	group, err := r.Database.GetGroupByID(id)
+	group, err := r.Database.GetGroupByID(groupID)
 	if err != nil {
 		return nil, err
 	}
@@ -101,12 +93,16 @@ func (r *mutationResolver) DeleteGroup(ctx context.Context, id string) (*models.
 		return nil, fmt.Errorf("permission denied")
 	}
 
-	return r.Database.DeleteGroupByID(id)
+	return r.Database.DeleteGroupByID(groupID)
 }
 
 type groupResolver struct{ *Resolver }
 
 func (r *Resolver) Group() GroupResolver { return &groupResolver{r} }
+
+func (r *groupResolver) ID(ctx context.Context, obj *models.Group) (string, error) {
+	return obj.ID.Hex(), nil
+}
 
 func (r *groupResolver) Habits(ctx context.Context, obj *models.Group) ([]*models.Habit, error) {
 	panic(fmt.Errorf("not implemented: Habits - habits"))

@@ -7,10 +7,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/infamous55/habit-tracker/internal/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
+
+	"github.com/infamous55/habit-tracker/internal/models"
 )
 
 func hashPassword(password string) (string, error) {
@@ -23,19 +24,14 @@ func hashPassword(password string) (string, error) {
 	return string(hash), nil
 }
 
-func (db *DatabaseWrapper) GetUserByID(id string) (*models.User, error) {
-	ID, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return nil, err
-	}
-
+func (db *DatabaseWrapper) GetUserByID(id primitive.ObjectID) (*models.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	result := db.Collection("users").FindOne(ctx, bson.M{"_id": ID})
+	result := db.Collection("users").FindOne(ctx, bson.M{"_id": id})
 
 	var user *models.User
-	err = result.Decode(&user)
+	err := result.Decode(&user)
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +68,7 @@ func (db *DatabaseWrapper) CreateUser(credentials models.Credentials) (*models.U
 		return nil, fmt.Errorf("inserted id error")
 	}
 
-	user.ID = oid.Hex()
+	user.ID = oid
 	return &user, nil
 }
 

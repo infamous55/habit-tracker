@@ -6,10 +6,11 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type CustomClaims struct {
-	UserID string `json:"userID"`
+	UserID primitive.ObjectID `json:"userID"`
 	jwt.StandardClaims
 }
 
@@ -35,7 +36,7 @@ func ParseJWTWithCustomClaims(tokenString string) (*CustomClaims, error) {
 	return claims, nil
 }
 
-func NewJWTWithCustomClaims(userID string) (string, error) {
+func NewJWTWithCustomClaims(userID primitive.ObjectID) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, CustomClaims{
 		UserID: userID,
 		StandardClaims: jwt.StandardClaims{

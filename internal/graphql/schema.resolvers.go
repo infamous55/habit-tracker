@@ -7,6 +7,10 @@ import (
 	"github.com/infamous55/habit-tracker/internal/models"
 )
 
+func (r *habitResolver) ID(ctx context.Context, obj *models.Habit) (string, error) {
+	panic(fmt.Errorf("not implemented: ID - id"))
+}
+
 func (r *habitResolver) Schedule(ctx context.Context, obj *models.Habit) (*models.Schedule, error) {
 	panic(fmt.Errorf("not implemented: Schedule - schedule"))
 }
