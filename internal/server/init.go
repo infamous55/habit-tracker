@@ -38,6 +38,11 @@ func setupIndexes(db mongodb.DatabaseWrapper) error {
 		return err
 	}
 
+	err = db.CreateIndex("habits", "group_id", false)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 

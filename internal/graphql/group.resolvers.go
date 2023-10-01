@@ -105,9 +105,9 @@ func (r *groupResolver) ID(ctx context.Context, obj *models.Group) (string, erro
 }
 
 func (r *groupResolver) Habits(ctx context.Context, obj *models.Group) ([]*models.Habit, error) {
-	panic(fmt.Errorf("not implemented: Habits - habits"))
+	return r.Database.GetHabitsByGroupID(obj.ID)
 }
 
 func (r *groupResolver) User(ctx context.Context, obj *models.Group) (*models.User, error) {
-	panic(fmt.Errorf("not implemented: User - user"))
+	return r.Database.GetUserByID(obj.UserID)
 }
