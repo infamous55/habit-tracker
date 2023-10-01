@@ -20,7 +20,7 @@ func (r *queryResolver) GetGroups(ctx context.Context) ([]*models.Group, error) 
 }
 
 func (r *queryResolver) GetGroup(ctx context.Context, id string) (*models.Group, error) {
-	_, err := auth.ExtractUserFromContext(ctx)
+	user, err := auth.ExtractUserFromContext(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -30,7 +30,16 @@ func (r *queryResolver) GetGroup(ctx context.Context, id string) (*models.Group,
 		return nil, err
 	}
 
-	return r.Database.GetGroupByID(groupID)
+	group, err := r.Database.GetGroupByID(groupID)
+	if err != nil {
+		return nil, err
+	}
+
+	if group.UserID != user.ID {
+		return nil, fmt.Errorf("permission denied")
+	}
+
+	return group, nil
 }
 
 func (r *mutationResolver) CreateGroup(
