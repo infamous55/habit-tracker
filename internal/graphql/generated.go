@@ -127,7 +127,6 @@ type GroupResolver interface {
 type HabitResolver interface {
 	ID(ctx context.Context, obj *models.Habit) (string, error)
 
-	Schedule(ctx context.Context, obj *models.Habit) (*models.Schedule, error)
 	Successes(ctx context.Context, obj *models.Habit) ([]*models.Success, error)
 	Group(ctx context.Context, obj *models.Habit) (*models.Group, error)
 	User(ctx context.Context, obj *models.Habit) (*models.User, error)
@@ -1452,7 +1451,7 @@ func (ec *executionContext) _Habit_schedule(ctx context.Context, field graphql.C
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Habit().Schedule(rctx, obj)
+		return obj.Schedule, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1464,17 +1463,17 @@ func (ec *executionContext) _Habit_schedule(ctx context.Context, field graphql.C
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*models.Schedule)
+	res := resTmp.(models.Schedule)
 	fc.Result = res
-	return ec.marshalNSchedule2ᚖgithubᚗcomᚋinfamous55ᚋhabitᚑtrackerᚋinternalᚋmodelsᚐSchedule(ctx, field.Selections, res)
+	return ec.marshalNSchedule2githubᚗcomᚋinfamous55ᚋhabitᚑtrackerᚋinternalᚋmodelsᚐSchedule(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Habit_schedule(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Habit",
 		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
+		IsMethod:   false,
+		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "type":
@@ -5497,7 +5496,7 @@ func (ec *executionContext) unmarshalInputNewHabit(ctx context.Context, obj inte
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("schedule"))
-			data, err := ec.unmarshalNScheduleInput2ᚖgithubᚗcomᚋinfamous55ᚋhabitᚑtrackerᚋinternalᚋmodelsᚐScheduleInput(ctx, v)
+			data, err := ec.unmarshalNScheduleInput2githubᚗcomᚋinfamous55ᚋhabitᚑtrackerᚋinternalᚋmodelsᚐScheduleInput(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -5885,41 +5884,10 @@ func (ec *executionContext) _Habit(ctx context.Context, sel ast.SelectionSet, ob
 		case "description":
 			out.Values[i] = ec._Habit_description(ctx, field, obj)
 		case "schedule":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Habit_schedule(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
+			out.Values[i] = ec._Habit_schedule(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
 			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "successes":
 			field := field
 
@@ -7105,19 +7073,9 @@ func (ec *executionContext) marshalNSchedule2githubᚗcomᚋinfamous55ᚋhabit�
 	return ec._Schedule(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNSchedule2ᚖgithubᚗcomᚋinfamous55ᚋhabitᚑtrackerᚋinternalᚋmodelsᚐSchedule(ctx context.Context, sel ast.SelectionSet, v *models.Schedule) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._Schedule(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalNScheduleInput2ᚖgithubᚗcomᚋinfamous55ᚋhabitᚑtrackerᚋinternalᚋmodelsᚐScheduleInput(ctx context.Context, v interface{}) (*models.ScheduleInput, error) {
+func (ec *executionContext) unmarshalNScheduleInput2githubᚗcomᚋinfamous55ᚋhabitᚑtrackerᚋinternalᚋmodelsᚐScheduleInput(ctx context.Context, v interface{}) (models.ScheduleInput, error) {
 	res, err := ec.unmarshalInputScheduleInput(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNScheduleType2githubᚗcomᚋinfamous55ᚋhabitᚑtrackerᚋinternalᚋmodelsᚐScheduleType(ctx context.Context, v interface{}) (models.ScheduleType, error) {
