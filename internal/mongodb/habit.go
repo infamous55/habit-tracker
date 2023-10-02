@@ -119,3 +119,23 @@ func (db *DatabaseWrapper) UpdateHabit(data models.HabitUpdate) (*models.Habit, 
 
 	return db.GetHabitByID(data.ID)
 }
+
+func (db *DatabaseWrapper) DeleteHabitByID(id primitive.ObjectID) (*models.Habit, error) {
+	filter := bson.D{{Key: "_id", Value: id}}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	result := db.Collection("habits").FindOneAndDelete(ctx, filter)
+	err := result.Err()
+	if err != nil {
+		return nil, err
+	}
+
+	var deletedHabit models.Habit
+	err = result.Decode(&deletedHabit)
+	if err != nil {
+		return nil, err
+	}
+	return &deletedHabit, nil
+}

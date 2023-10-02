@@ -127,7 +127,26 @@ func (r *mutationResolver) UpdateHabit(
 }
 
 func (r *mutationResolver) DeleteHabit(ctx context.Context, id string) (*models.Habit, error) {
-	panic(fmt.Errorf("not implemented: DeleteHabit - deleteHabit"))
+	user, err := auth.ExtractUserFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	habitID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	habit, err := r.Database.GetHabitByID(habitID)
+	if err != nil {
+		return nil, err
+	}
+
+	if habit.UserID != user.ID {
+		return nil, fmt.Errorf("permission denied")
+	}
+
+	return r.Database.DeleteHabitByID(habitID)
 }
 
 type habitResolver struct{ *Resolver }
@@ -139,7 +158,7 @@ func (r *habitResolver) ID(ctx context.Context, obj *models.Habit) (string, erro
 }
 
 func (r *habitResolver) Schedule(ctx context.Context, obj *models.Habit) (*models.Schedule, error) {
-	panic(fmt.Errorf("not implemented: Schedule - schedule"))
+	return &obj.Schedule, nil
 }
 
 func (r *habitResolver) Successes(
@@ -150,9 +169,9 @@ func (r *habitResolver) Successes(
 }
 
 func (r *habitResolver) Group(ctx context.Context, obj *models.Habit) (*models.Group, error) {
-	panic(fmt.Errorf("not implemented: Group - group"))
+	return r.Database.GetGroupByID(obj.GroupID)
 }
 
 func (r *habitResolver) User(ctx context.Context, obj *models.Habit) (*models.User, error) {
-	panic(fmt.Errorf("not implemented: User - user"))
+	return r.Database.GetUserByID(obj.UserID)
 }
