@@ -25,13 +25,15 @@ type Habit {
   user: User!
 }
 
+scalar Time
+
 type Schedule {
   type: ScheduleType!
   weekdays: [Weekday!]
   monthdays: [Int!]
   repeatInterval: Int
   repeatUnit: RepeatUnit
-  start: String!
+  start: Time!
 }
 
 enum ScheduleType {
@@ -104,7 +106,7 @@ input ScheduleInput {
   monthdays: [Int!]
   repeatInterval: Int
   repeatUnit: RepeatUnit
-  start: String!
+  start: Time!
 }
 
 input HabitData {

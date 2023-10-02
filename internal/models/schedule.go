@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"strconv"
+	"time"
 )
 
 type Schedule struct {
@@ -12,7 +13,7 @@ type Schedule struct {
 	Monthdays      []int        `json:"monthdays,omitempty"       bson:"monthdays,omitempty"`
 	RepeatInterval *int         `json:"repeat_interval,omitempty" bson:"repeat_interval,omitempty"`
 	RepeatUnit     *RepeatUnit  `json:"repeat_unit,omitempty"     bson:"repeat_unit,omitempty"`
-	Start          string       `json:"start"                     bson:"start"`
+	Start          time.Time    `json:"start"                     bson:"start"`
 }
 
 // gqlgen does not allow using objects as inputs; only scalars, enums, and input_objects work
@@ -22,7 +23,20 @@ type ScheduleInput struct {
 	Monthdays      []int        `json:"monthdays,omitempty"       bson:"monthdays,omitempty"`
 	RepeatInterval *int         `json:"repeat_interval,omitempty" bson:"repeat_interval,omitempty"`
 	RepeatUnit     *RepeatUnit  `json:"repeat_unit,omitempty"     bson:"repeat_unit,omitempty"`
-	Start          string       `json:"start"                     bson:"start"`
+	Start          time.Time    `json:"start"                     bson:"start"`
+}
+
+func (e ScheduleInput) IsValid() bool {
+	switch e.Type {
+	case ScheduleTypeWeekly:
+		return len(e.Weekdays) != 0
+	case ScheduleTypeMonthly:
+		return len(e.Monthdays) != 0
+	case ScheduleTypePeriodic:
+		return e.RepeatUnit != nil && e.RepeatInterval != nil && *e.RepeatInterval > 0
+	default:
+		return false
+	}
 }
 
 type RepeatUnit string

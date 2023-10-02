@@ -66,6 +66,11 @@ func (r *mutationResolver) CreateHabit(
 		return nil, fmt.Errorf("bad request")
 	}
 
+	ok := input.Schedule.IsValid()
+	if !ok {
+		return nil, fmt.Errorf("invalid schedule")
+	}
+
 	data := models.HabitCreate{
 		Name:        input.Name,
 		Description: input.Description,
@@ -114,6 +119,10 @@ func (r *mutationResolver) UpdateHabit(
 		if group.UserID != user.ID {
 			return nil, fmt.Errorf("bad request")
 		}
+	}
+
+	if input.Schedule != nil && !input.Schedule.IsValid() {
+		return nil, fmt.Errorf("invalid schedule")
 	}
 
 	data := models.HabitUpdate{
