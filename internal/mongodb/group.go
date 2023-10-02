@@ -60,13 +60,8 @@ func (db *DatabaseWrapper) CreateGroup(data models.NewGroup) (*models.Group, err
 	}, nil
 }
 
-func (db *DatabaseWrapper) UpdateGroup(data models.GroupData) (*models.Group, error) {
-	ID, err := primitive.ObjectIDFromHex(data.ID)
-	if err != nil {
-		return nil, err
-	}
-
-	filter := bson.D{{Key: "_id", Value: ID}}
+func (db *DatabaseWrapper) UpdateGroup(data models.GroupUpdate) (*models.Group, error) {
+	filter := bson.D{{Key: "_id", Value: data.ID}}
 
 	update := bson.D{}
 	if data.Name != nil {
@@ -85,19 +80,12 @@ func (db *DatabaseWrapper) UpdateGroup(data models.GroupData) (*models.Group, er
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	result := db.Collection("groups").FindOneAndUpdate(ctx, filter, update)
-	err = result.Err()
+	_, err := db.Collection("groups").UpdateOne(ctx, filter, update)
 	if err != nil {
 		return nil, err
 	}
 
-	// this returns the object as it was before updating it
-	var updatedGroup models.Group
-	err = result.Decode(&updatedGroup)
-	if err != nil {
-		return nil, err
-	}
-	return &updatedGroup, nil
+	return db.GetGroupByID(data.ID)
 }
 
 func (db *DatabaseWrapper) DeleteGroupByID(id primitive.ObjectID) (*models.Group, error) {

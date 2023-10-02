@@ -78,8 +78,12 @@ func (r *mutationResolver) UpdateGroup(
 		return nil, fmt.Errorf("permission denied")
 	}
 
-	// this is the only place where the group id is of type string
-	return r.Database.UpdateGroup(input)
+	data := models.GroupUpdate{
+		ID:          groupID,
+		Name:        input.Name,
+		Description: input.Description,
+	}
+	return r.Database.UpdateGroup(data)
 }
 
 func (r *mutationResolver) DeleteGroup(ctx context.Context, id string) (*models.Group, error) {
