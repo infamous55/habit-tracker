@@ -23,26 +23,23 @@ import (
 )
 
 func setupIndexes(db mongodb.DatabaseWrapper) error {
-	err := db.CreateIndex("users", "email", true)
-	if err != nil {
-		return err
+	indexes := []struct {
+		collection string
+		field      string
+		unique     bool
+	}{
+		{"users", "email", true},
+		{"groups", "user_id", false},
+		{"habits", "user_id", false},
+		{"habits", "group_id", false},
 	}
 
-	err = db.CreateIndex("groups", "user_id", false)
-	if err != nil {
-		return err
+	for _, index := range indexes {
+		err := db.CreateIndex(index.collection, index.field, index.unique)
+		if err != nil {
+			return err
+		}
 	}
-
-	err = db.CreateIndex("habits", "user_id", false)
-	if err != nil {
-		return err
-	}
-
-	err = db.CreateIndex("habits", "group_id", false)
-	if err != nil {
-		return err
-	}
-
 	return nil
 }
 
