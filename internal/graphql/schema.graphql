@@ -70,8 +70,8 @@ type Query {
   getGroup(id: ID!): Group
   getHabits(
     groupId: ID
-    startDate: String
-    endDate: String
+    startDate: Time
+    endDate: Time
     succeeded: Boolean
   ): [Habit!]!
   getHabit(id: ID!): Habit

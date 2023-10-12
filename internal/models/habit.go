@@ -1,6 +1,10 @@
 package models
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
+import (
+	"time"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
 
 type Habit struct {
 	ID          primitive.ObjectID `json:"id"                    bson:"_id"`
@@ -32,4 +36,12 @@ type HabitUpdate struct {
 	Description *string             `json:"description,omitempty" bson:"description,omitempty"`
 	Schedule    *ScheduleInput      `json:"schedule,omitempty"    bson:"schedule,omitempty"`
 	GroupID     *primitive.ObjectID `json:"group_id,omitempty"    bson:"group_id,omitempty"`
+}
+
+type HabitFilterOptions struct {
+	UserID    primitive.ObjectID
+	GroupID   *primitive.ObjectID
+	StartDate *time.Time
+	EndDate   *time.Time
+	Succeded  *bool
 }

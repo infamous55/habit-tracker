@@ -91,7 +91,7 @@ type ComplexityRoot struct {
 		GetGroup       func(childComplexity int, id string) int
 		GetGroups      func(childComplexity int) int
 		GetHabit       func(childComplexity int, id string) int
-		GetHabits      func(childComplexity int, groupID *string, startDate *string, endDate *string, succeeded *bool) int
+		GetHabits      func(childComplexity int, groupID *string, startDate *time.Time, endDate *time.Time, succeeded *bool) int
 	}
 
 	Schedule struct {
@@ -149,7 +149,7 @@ type QueryResolver interface {
 	GetCurrentUser(ctx context.Context) (*models.User, error)
 	GetGroups(ctx context.Context) ([]*models.Group, error)
 	GetGroup(ctx context.Context, id string) (*models.Group, error)
-	GetHabits(ctx context.Context, groupID *string, startDate *string, endDate *string, succeeded *bool) ([]*models.Habit, error)
+	GetHabits(ctx context.Context, groupID *string, startDate *time.Time, endDate *time.Time, succeeded *bool) ([]*models.Habit, error)
 	GetHabit(ctx context.Context, id string) (*models.Habit, error)
 }
 type UserResolver interface {
@@ -447,7 +447,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.GetHabits(childComplexity, args["groupId"].(*string), args["startDate"].(*string), args["endDate"].(*string), args["succeeded"].(*bool)), true
+		return e.complexity.Query.GetHabits(childComplexity, args["groupId"].(*string), args["startDate"].(*time.Time), args["endDate"].(*time.Time), args["succeeded"].(*bool)), true
 
 	case "Schedule.monthdays":
 		if e.complexity.Schedule.Monthdays == nil {
@@ -892,19 +892,19 @@ func (ec *executionContext) field_Query_getHabits_args(ctx context.Context, rawA
 		}
 	}
 	args["groupId"] = arg0
-	var arg1 *string
+	var arg1 *time.Time
 	if tmp, ok := rawArgs["startDate"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("startDate"))
-		arg1, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		arg1, err = ec.unmarshalOTime2ᚖtimeᚐTime(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
 	args["startDate"] = arg1
-	var arg2 *string
+	var arg2 *time.Time
 	if tmp, ok := rawArgs["endDate"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("endDate"))
-		arg2, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		arg2, err = ec.unmarshalOTime2ᚖtimeᚐTime(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2554,7 +2554,7 @@ func (ec *executionContext) _Query_getHabits(ctx context.Context, field graphql.
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GetHabits(rctx, fc.Args["groupId"].(*string), fc.Args["startDate"].(*string), fc.Args["endDate"].(*string), fc.Args["succeeded"].(*bool))
+		return ec.resolvers.Query().GetHabits(rctx, fc.Args["groupId"].(*string), fc.Args["startDate"].(*time.Time), fc.Args["endDate"].(*time.Time), fc.Args["succeeded"].(*bool))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -7609,6 +7609,22 @@ func (ec *executionContext) marshalOSuccess2ᚖgithubᚗcomᚋinfamous55ᚋhabit
 		return graphql.Null
 	}
 	return ec._Success(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOTime2ᚖtimeᚐTime(ctx context.Context, v interface{}) (*time.Time, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalTime(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOTime2ᚖtimeᚐTime(ctx context.Context, sel ast.SelectionSet, v *time.Time) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := graphql.MarshalTime(*v)
+	return res
 }
 
 func (ec *executionContext) marshalOUser2ᚖgithubᚗcomᚋinfamous55ᚋhabitᚑtrackerᚋinternalᚋmodelsᚐUser(ctx context.Context, sel ast.SelectionSet, v *models.User) graphql.Marshaler {

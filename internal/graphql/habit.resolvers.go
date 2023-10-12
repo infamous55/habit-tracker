@@ -3,6 +3,7 @@ package graphql
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 
@@ -13,11 +14,43 @@ import (
 func (r *queryResolver) GetHabits(
 	ctx context.Context,
 	groupID *string,
-	startDate *string,
-	endDate *string,
+	startDate *time.Time,
+	endDate *time.Time,
 	succeeded *bool,
 ) ([]*models.Habit, error) {
-	panic(fmt.Errorf("not implemented: GetHabits - getHabits"))
+	user, err := auth.ExtractUserFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	options := models.HabitFilterOptions{
+		UserID: user.ID,
+	}
+
+	if groupID != nil {
+		parsedGroupID, err := primitive.ObjectIDFromHex(*groupID)
+		if err != nil {
+			return nil, err
+		}
+
+		group, err := r.Database.GetGroupByID(parsedGroupID)
+		if err != nil {
+			return nil, err
+		}
+
+		if group.UserID != user.ID {
+			return nil, fmt.Errorf("bad request")
+		}
+
+		options.GroupID = &parsedGroupID
+	}
+
+	if startDate != nil && endDate != nil {
+		options.StartDate = startDate
+		options.EndDate = endDate
+	}
+
+	return r.Database.GetHabitsWithFilter(options)
 }
 
 func (r *queryResolver) GetHabit(ctx context.Context, id string) (*models.Habit, error) {
