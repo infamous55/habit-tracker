@@ -152,6 +152,28 @@ func (db *DatabaseWrapper) GetHabitsWithFilter(
 		filter["group_id"] = *options.GroupID
 	}
 
+	pipeline := []bson.M{
+		{
+			"$match": filter,
+		},
+		{
+			"$lookup": bson.M{
+				"from":         "successes",
+				"localField":   "_id",
+				"foreignField": "habit_id",
+				"as":           "successes",
+			},
+		},
+	}
+
+	if options.Succeeded != nil {
+		pipeline = append(pipeline, bson.M{
+			"$match": bson.M{
+				"successes": bson.M{"$exists": *options.Succeeded},
+			},
+		})
+	}
+
 	if options.StartDate != nil && options.EndDate != nil {
 		filter["$and"] = []bson.M{
 			{
@@ -196,12 +218,20 @@ func (db *DatabaseWrapper) GetHabitsWithFilter(
 				},
 			},
 		}
+
+		dateFilter := bson.M{
+			"successes.date": bson.M{
+				"$gte": options.StartDate,
+				"$lte": options.EndDate,
+			},
+		}
+		pipeline = append(pipeline, bson.M{"$match": dateFilter})
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	cur, err := db.Collection("habits").Find(ctx, filter)
+	cur, err := db.Collection("habits").Aggregate(ctx, pipeline)
 	if err != nil {
 		return nil, err
 	}

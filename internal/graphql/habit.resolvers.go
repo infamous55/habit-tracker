@@ -50,6 +50,10 @@ func (r *queryResolver) GetHabits(
 		options.EndDate = endDate
 	}
 
+	if succeeded != nil {
+		options.Succeeded = succeeded
+	}
+
 	return r.Database.GetHabitsWithFilter(options)
 }
 
