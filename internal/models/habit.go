@@ -30,6 +30,14 @@ type HabitCreate struct {
 	UserID      primitive.ObjectID `json:"user_id"               bson:"user_id"`
 }
 
+type HabitData struct {
+	ID          string         `json:"id"`
+	Name        *string        `json:"name,omitempty"`
+	Description *string        `json:"description,omitempty"`
+	Schedule    *ScheduleInput `json:"schedule,omitempty"`
+	GroupID     *string        `json:"group_id,omitempty"`
+}
+
 type HabitUpdate struct {
 	ID          primitive.ObjectID  `json:"id"                    bson:"_id"`
 	Name        *string             `json:"name,omitempty"        bson:"name,omitempty"`
@@ -43,5 +51,5 @@ type HabitFilterOptions struct {
 	GroupID   *primitive.ObjectID
 	StartDate *time.Time
 	EndDate   *time.Time
-	Succeded  *bool
+	Succeeded *bool
 }

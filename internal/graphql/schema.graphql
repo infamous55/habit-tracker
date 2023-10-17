@@ -60,7 +60,7 @@ enum RepeatUnit {
 
 type Success {
   id: ID!
-  date: String!
+  date: Time!
   habit: Habit!
 }
 
@@ -118,7 +118,7 @@ input HabitData {
 }
 
 input NewSuccess {
-  date: String!
+  date: Time!
   habitId: ID!
 }
 

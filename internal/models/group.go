@@ -15,6 +15,12 @@ type NewGroup struct {
 	UserID      primitive.ObjectID `json:"user_id"               bson:"user_id"`
 }
 
+type GroupData struct {
+	ID          string  `json:"id"`
+	Name        *string `json:"name,omitempty"`
+	Description *string `json:"description,omitempty"`
+}
+
 type GroupUpdate struct {
 	ID          primitive.ObjectID `json:"id"                    bson:"_id"`
 	Name        *string            `json:"name,omitempty"        bson:"name,omitempty"`
