@@ -175,7 +175,10 @@ func (db *DatabaseWrapper) GetHabitsWithFilter(
 	}
 
 	if options.StartDate != nil && options.EndDate != nil {
-		filter["$and"] = []bson.M{
+		filter["schedule.start"] = bson.M{
+			"$lte": *options.EndDate,
+		}
+		filter["$or"] = []bson.M{
 			{
 				"schedule.type": "WEEKLY",
 				"schedule.weekdays": bson.M{
@@ -193,39 +196,18 @@ func (db *DatabaseWrapper) GetHabitsWithFilter(
 					},
 				},
 			},
-			{
-				"schedule.type":  "PERIODIC",
-				"schedule.start": bson.M{"$lte": *options.EndDate},
-				"$or": []bson.M{
-					{
-						"schedule.repeat_unit": "DAY",
-						"schedule.repeat_interval": bson.M{
-							"$gte": int(options.StartDate.Sub(*options.EndDate).Hours() / 24),
-						},
-					},
-					{
-						"schedule.repeat_unit": "WEEK",
-						"schedule.repeat_interval": bson.M{
-							"$gte": int(options.StartDate.Sub(*options.EndDate).Hours() / 24 / 7),
-						},
-					},
-					{
-						"schedule.repeat_unit": "MONTH",
-						"schedule.repeat_interval": bson.M{
-							"$gte": int(options.StartDate.Sub(*options.EndDate).Hours() / 24 / 30),
-						},
-					},
-				},
-			},
 		}
 
-		dateFilter := bson.M{
-			"successes.date": bson.M{
-				"$gte": options.StartDate,
-				"$lte": options.EndDate,
-			},
+		if options.Succeeded != nil && *options.Succeeded {
+			pipeline = append(pipeline, bson.M{
+				"$match": bson.M{
+					"successes.date": bson.M{
+						"$gte": options.StartDate,
+						"$lte": options.EndDate,
+					},
+				},
+			})
 		}
-		pipeline = append(pipeline, bson.M{"$match": dateFilter})
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -242,10 +224,28 @@ func (db *DatabaseWrapper) GetHabitsWithFilter(
 	if err != nil {
 		return nil, err
 	}
+
+	if options.StartDate != nil && options.EndDate != nil {
+		startDate := options.StartDate.Truncate(24 * time.Hour)
+		endDate := options.EndDate.Truncate(24 * time.Hour)
+		for i, habit := range results {
+			scheduleStartDate := habit.Schedule.Start.Truncate(24 * time.Hour)
+			if habit.Schedule.Type == "PERIODIC" &&
+				int(
+					startDate.Sub(scheduleStartDate).Hours()/24,
+				)%*habit.Schedule.PeriodInDays > int(
+					endDate.Sub(startDate).Hours()/24,
+				) {
+				results[i] = results[len(results)-1]
+				results = results[:len(results)-1]
+			}
+		}
+	}
+
 	return results, nil
 }
 
-func weekdaysWithinInterval(start, end time.Time) []string {
+func weekdaysWithinInterval(start time.Time, end time.Time) []string {
 	weekdays := make(map[string]struct{})
 	for d := start; !d.After(end); d = d.AddDate(0, 0, 1) {
 		if d.Weekday() != time.Saturday && d.Weekday() != time.Sunday {

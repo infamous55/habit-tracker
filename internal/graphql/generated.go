@@ -96,12 +96,11 @@ type ComplexityRoot struct {
 	}
 
 	Schedule struct {
-		Monthdays      func(childComplexity int) int
-		RepeatInterval func(childComplexity int) int
-		RepeatUnit     func(childComplexity int) int
-		Start          func(childComplexity int) int
-		Type           func(childComplexity int) int
-		Weekdays       func(childComplexity int) int
+		Monthdays    func(childComplexity int) int
+		PeriodInDays func(childComplexity int) int
+		Start        func(childComplexity int) int
+		Type         func(childComplexity int) int
+		Weekdays     func(childComplexity int) int
 	}
 
 	Success struct {
@@ -462,19 +461,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Schedule.Monthdays(childComplexity), true
 
-	case "Schedule.repeatInterval":
-		if e.complexity.Schedule.RepeatInterval == nil {
+	case "Schedule.periodInDays":
+		if e.complexity.Schedule.PeriodInDays == nil {
 			break
 		}
 
-		return e.complexity.Schedule.RepeatInterval(childComplexity), true
-
-	case "Schedule.repeatUnit":
-		if e.complexity.Schedule.RepeatUnit == nil {
-			break
-		}
-
-		return e.complexity.Schedule.RepeatUnit(childComplexity), true
+		return e.complexity.Schedule.PeriodInDays(childComplexity), true
 
 	case "Schedule.start":
 		if e.complexity.Schedule.Start == nil {
@@ -1489,10 +1481,8 @@ func (ec *executionContext) fieldContext_Habit_schedule(ctx context.Context, fie
 				return ec.fieldContext_Schedule_weekdays(ctx, field)
 			case "monthdays":
 				return ec.fieldContext_Schedule_monthdays(ctx, field)
-			case "repeatInterval":
-				return ec.fieldContext_Schedule_repeatInterval(ctx, field)
-			case "repeatUnit":
-				return ec.fieldContext_Schedule_repeatUnit(ctx, field)
+			case "periodInDays":
+				return ec.fieldContext_Schedule_periodInDays(ctx, field)
 			case "start":
 				return ec.fieldContext_Schedule_start(ctx, field)
 			}
@@ -2940,8 +2930,8 @@ func (ec *executionContext) fieldContext_Schedule_monthdays(ctx context.Context,
 	return fc, nil
 }
 
-func (ec *executionContext) _Schedule_repeatInterval(ctx context.Context, field graphql.CollectedField, obj *models.Schedule) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Schedule_repeatInterval(ctx, field)
+func (ec *executionContext) _Schedule_periodInDays(ctx context.Context, field graphql.CollectedField, obj *models.Schedule) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Schedule_periodInDays(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2954,7 +2944,7 @@ func (ec *executionContext) _Schedule_repeatInterval(ctx context.Context, field 
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.RepeatInterval, nil
+		return obj.PeriodInDays, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2968,7 +2958,7 @@ func (ec *executionContext) _Schedule_repeatInterval(ctx context.Context, field 
 	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Schedule_repeatInterval(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Schedule_periodInDays(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Schedule",
 		Field:      field,
@@ -2976,47 +2966,6 @@ func (ec *executionContext) fieldContext_Schedule_repeatInterval(ctx context.Con
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Schedule_repeatUnit(ctx context.Context, field graphql.CollectedField, obj *models.Schedule) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Schedule_repeatUnit(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.RepeatUnit, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*models.RepeatUnit)
-	fc.Result = res
-	return ec.marshalORepeatUnit2ᚖgithubᚗcomᚋinfamous55ᚋhabitᚑtrackerᚋinternalᚋmodelsᚐRepeatUnit(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Schedule_repeatUnit(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Schedule",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type RepeatUnit does not have child fields")
 		},
 	}
 	return fc, nil
@@ -5568,7 +5517,7 @@ func (ec *executionContext) unmarshalInputScheduleInput(ctx context.Context, obj
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"type", "weekdays", "monthdays", "repeatInterval", "repeatUnit", "start"}
+	fieldsInOrder := [...]string{"type", "weekdays", "monthdays", "periodInDays", "start"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -5602,24 +5551,15 @@ func (ec *executionContext) unmarshalInputScheduleInput(ctx context.Context, obj
 				return it, err
 			}
 			it.Monthdays = data
-		case "repeatInterval":
+		case "periodInDays":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("repeatInterval"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("periodInDays"))
 			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.RepeatInterval = data
-		case "repeatUnit":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("repeatUnit"))
-			data, err := ec.unmarshalORepeatUnit2ᚖgithubᚗcomᚋinfamous55ᚋhabitᚑtrackerᚋinternalᚋmodelsᚐRepeatUnit(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.RepeatUnit = data
+			it.PeriodInDays = data
 		case "start":
 			var err error
 
@@ -6307,10 +6247,8 @@ func (ec *executionContext) _Schedule(ctx context.Context, sel ast.SelectionSet,
 			out.Values[i] = ec._Schedule_weekdays(ctx, field, obj)
 		case "monthdays":
 			out.Values[i] = ec._Schedule_monthdays(ctx, field, obj)
-		case "repeatInterval":
-			out.Values[i] = ec._Schedule_repeatInterval(ctx, field, obj)
-		case "repeatUnit":
-			out.Values[i] = ec._Schedule_repeatUnit(ctx, field, obj)
+		case "periodInDays":
+			out.Values[i] = ec._Schedule_periodInDays(ctx, field, obj)
 		case "start":
 			out.Values[i] = ec._Schedule_start(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -7630,22 +7568,6 @@ func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.Sele
 	}
 	res := graphql.MarshalInt(*v)
 	return res
-}
-
-func (ec *executionContext) unmarshalORepeatUnit2ᚖgithubᚗcomᚋinfamous55ᚋhabitᚑtrackerᚋinternalᚋmodelsᚐRepeatUnit(ctx context.Context, v interface{}) (*models.RepeatUnit, error) {
-	if v == nil {
-		return nil, nil
-	}
-	var res = new(models.RepeatUnit)
-	err := res.UnmarshalGQL(v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalORepeatUnit2ᚖgithubᚗcomᚋinfamous55ᚋhabitᚑtrackerᚋinternalᚋmodelsᚐRepeatUnit(ctx context.Context, sel ast.SelectionSet, v *models.RepeatUnit) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return v
 }
 
 func (ec *executionContext) unmarshalOScheduleInput2ᚖgithubᚗcomᚋinfamous55ᚋhabitᚑtrackerᚋinternalᚋmodelsᚐScheduleInput(ctx context.Context, v interface{}) (*models.ScheduleInput, error) {

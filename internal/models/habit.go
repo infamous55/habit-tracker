@@ -1,6 +1,7 @@
 package models
 
 import (
+	"slices"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -52,4 +53,48 @@ type HabitFilterOptions struct {
 	StartDate *time.Time
 	EndDate   *time.Time
 	Succeeded *bool
+}
+
+func (h *Habit) IsScheduled(date time.Time) bool {
+	startDate := h.Schedule.Start.Truncate(24 * time.Hour)
+	currentDate := date.Truncate(24 * time.Hour)
+
+	if currentDate.Before(startDate) {
+		return false
+	}
+
+	if currentDate.Equal(startDate) {
+		return true
+	}
+
+	switch h.Schedule.Type {
+	case ScheduleTypeWeekly:
+		return slices.Contains(h.Schedule.Weekdays, TimeToWeekday(currentDate))
+	case ScheduleTypeMonthly:
+		return slices.Contains(h.Schedule.Monthdays, currentDate.Day())
+	case ScheduleTypePeriodic:
+		return int(currentDate.Sub(startDate).Hours()/24)%*h.Schedule.PeriodInDays == 0
+	default:
+		return false
+	}
+}
+
+func TimeToWeekday(date time.Time) Weekday {
+	switch date.Weekday() {
+	case time.Monday:
+		return WeekdayMonday
+	case time.Tuesday:
+		return WeekdayTuesday
+	case time.Wednesday:
+		return WeekdayWednesday
+	case time.Thursday:
+		return WeekdayThursday
+	case time.Friday:
+		return WeekdayFriday
+	case time.Saturday:
+		return WeekdaySaturday
+	case time.Sunday:
+		return WeekdaySunday
+	}
+	return ""
 }

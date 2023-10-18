@@ -31,8 +31,7 @@ type Schedule {
   type: ScheduleType!
   weekdays: [Weekday!]
   monthdays: [Int!]
-  repeatInterval: Int
-  repeatUnit: RepeatUnit
+  periodInDays: Int
   start: Time!
 }
 
@@ -50,12 +49,6 @@ enum Weekday {
   FRIDAY
   SATURDAY
   SUNDAY
-}
-
-enum RepeatUnit {
-  DAY
-  WEEK
-  MONTH
 }
 
 type Success {
@@ -104,8 +97,7 @@ input ScheduleInput {
   type: ScheduleType!
   weekdays: [Weekday!]
   monthdays: [Int!]
-  repeatInterval: Int
-  repeatUnit: RepeatUnit
+  periodInDays: Int
   start: Time!
 }
 
