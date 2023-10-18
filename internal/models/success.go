@@ -16,3 +16,8 @@ type NewSuccess struct {
 	Date    time.Time `json:"date"     bson:"date"`
 	HabitID string    `json:"habit_id" bson:"habit_id"`
 }
+
+type SuccessCreate struct {
+	Date    time.Time          `json:"date"     bson:"date"`
+	HabitID primitive.ObjectID `json:"habit_id" bson:"habit_id"`
+}

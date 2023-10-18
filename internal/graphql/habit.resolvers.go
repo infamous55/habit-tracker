@@ -211,7 +211,7 @@ func (r *habitResolver) Successes(
 	ctx context.Context,
 	obj *models.Habit,
 ) ([]*models.Success, error) {
-	panic(fmt.Errorf("not implemented: Successes - successes"))
+	return r.Database.GetSuccessesByHabitID(obj.ID)
 }
 
 func (r *habitResolver) Group(ctx context.Context, obj *models.Habit) (*models.Group, error) {
