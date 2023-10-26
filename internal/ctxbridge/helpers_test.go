@@ -24,7 +24,7 @@ func TestEchoContextToContext(t *testing.T) {
 	err := EchoContextToContext(mockHandler)(ec)
 	assert.Nil(t, err)
 
-	assert.Equal(t, ec.Request().Context().Value(echoContextKey), ec)
+	assert.Equal(t, ec.Request().Context().Value(EchoContextKey), ec)
 	assert.True(t, mockHandlerWasCalled)
 }
 
@@ -34,7 +34,7 @@ func TestEchoContextFromContext(t *testing.T) {
 	rec := &echo.Response{}
 	ec := e.NewContext(req, rec)
 
-	ctx := context.WithValue(ec.Request().Context(), echoContextKey, ec)
+	ctx := context.WithValue(ec.Request().Context(), EchoContextKey, ec)
 
 	echoContext, err := EchoContextFromContext(ctx)
 	assert.Nil(t, err)

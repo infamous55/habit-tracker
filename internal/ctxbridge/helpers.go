@@ -13,12 +13,12 @@ type CustomContext struct {
 }
 
 const (
-	echoContextKey string = "echoContextKey"
+	EchoContextKey string = "echoContextKey"
 )
 
 func EchoContextToContext(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		ctx := context.WithValue(c.Request().Context(), echoContextKey, c)
+		ctx := context.WithValue(c.Request().Context(), EchoContextKey, c)
 		c.SetRequest(c.Request().WithContext(ctx))
 
 		cc := &CustomContext{c, ctx}
@@ -27,7 +27,7 @@ func EchoContextToContext(next echo.HandlerFunc) echo.HandlerFunc {
 }
 
 func EchoContextFromContext(ctx context.Context) (echo.Context, error) {
-	echoContext := ctx.Value(echoContextKey)
+	echoContext := ctx.Value(EchoContextKey)
 	if echoContext == nil {
 		return nil, fmt.Errorf("could not retrieve echo.Context")
 	}
