@@ -87,6 +87,7 @@ func Init() {
 	srv.Use(extension.AutomaticPersistedQuery{
 		Cache: lru.New(100),
 	})
+	srv.Use(extension.FixedComplexityLimit(5))
 
 	// conditionally disable introspection in production
 	if os.Getenv("ENVIRONMENT") == "production" {
