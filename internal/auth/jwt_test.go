@@ -12,6 +12,8 @@ import (
 )
 
 func TestParseJWTWithCustomClaims(t *testing.T) {
+	t.Parallel()
+
 	userID := primitive.NewObjectID()
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, CustomClaims{
@@ -23,7 +25,7 @@ func TestParseJWTWithCustomClaims(t *testing.T) {
 	})
 
 	signedToken, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	claims, err := ParseJWTWithCustomClaims(signedToken)
 	assert.Nil(t, err)
@@ -31,6 +33,8 @@ func TestParseJWTWithCustomClaims(t *testing.T) {
 }
 
 func TestNewJWTWithCustomClaims(t *testing.T) {
+	t.Parallel()
+
 	userID := primitive.NewObjectID()
 
 	tokenString, err := NewJWTWithCustomClaims(userID)

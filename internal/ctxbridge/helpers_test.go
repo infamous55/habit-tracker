@@ -10,6 +10,8 @@ import (
 )
 
 func TestEchoContextToContext(t *testing.T) {
+	t.Parallel()
+
 	e := echo.New()
 	req := &http.Request{}
 	res := &echo.Response{}
@@ -29,6 +31,8 @@ func TestEchoContextToContext(t *testing.T) {
 }
 
 func TestEchoContextFromContext(t *testing.T) {
+	t.Parallel()
+
 	e := echo.New()
 	req := &http.Request{}
 	rec := &echo.Response{}

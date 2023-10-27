@@ -2,6 +2,7 @@ package mongodb
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -72,7 +73,11 @@ func (db *DatabaseWrapper) CreateSuccess(input models.SuccessCreate) (*models.Su
 		return nil, err
 	}
 
-	insertedID := result.InsertedID.(primitive.ObjectID)
+	insertedID, ok := result.InsertedID.(primitive.ObjectID)
+	if !ok {
+		return nil, fmt.Errorf("invalid inserted ID: %v", result.InsertedID)
+	}
+
 	return &models.Success{
 		ID:      insertedID,
 		Date:    input.Date,

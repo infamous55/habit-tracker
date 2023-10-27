@@ -12,6 +12,8 @@ import (
 )
 
 func TestGetUserByID(t *testing.T) {
+	t.Parallel()
+
 	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
 	defer mt.Close()
 
@@ -46,6 +48,8 @@ func TestGetUserByID(t *testing.T) {
 }
 
 func TestCreateUser(t *testing.T) {
+	t.Parallel()
+
 	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
 	defer mt.Close()
 
@@ -100,6 +104,8 @@ func TestCreateUser(t *testing.T) {
 }
 
 func TestGetUserByEmail(t *testing.T) {
+	t.Parallel()
+
 	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
 	defer mt.Close()
 

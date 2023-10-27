@@ -2,6 +2,7 @@ package mongodb
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"time"
 
@@ -70,7 +71,11 @@ func (db *DatabaseWrapper) CreateHabit(data models.HabitCreate) (*models.Habit, 
 		return nil, err
 	}
 
-	insertedID := result.InsertedID.(primitive.ObjectID)
+	insertedID, ok := result.InsertedID.(primitive.ObjectID)
+	if !ok {
+		return nil, fmt.Errorf("invalid inserted ID: %v", result.InsertedID)
+	}
+
 	return &models.Habit{
 		ID:          insertedID,
 		Name:        data.Name,

@@ -13,6 +13,8 @@ import (
 )
 
 func TestExtractUserFromEchoContext(t *testing.T) {
+	t.Parallel()
+
 	e := echo.New()
 	req := &http.Request{}
 	res := &echo.Response{}
@@ -22,11 +24,13 @@ func TestExtractUserFromEchoContext(t *testing.T) {
 	ec.Set(userKey, user)
 
 	extractedUser, err := ExtractUserFromEchoContext(ec)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, user, extractedUser)
 }
 
 func TestExtractUserFromContext(t *testing.T) {
+	t.Parallel()
+
 	e := echo.New()
 	req := &http.Request{}
 	rec := &echo.Response{}
@@ -38,6 +42,6 @@ func TestExtractUserFromContext(t *testing.T) {
 	ctx := context.WithValue(ec.Request().Context(), ctxbridge.EchoContextKey, ec)
 
 	extractedUser, err := ExtractUserFromContext(ctx)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, user, extractedUser)
 }

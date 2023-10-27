@@ -2,6 +2,7 @@ package mongodb
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -51,7 +52,11 @@ func (db *DatabaseWrapper) CreateGroup(data models.NewGroup) (*models.Group, err
 		return nil, err
 	}
 
-	insertedID := result.InsertedID.(primitive.ObjectID)
+	insertedID, ok := result.InsertedID.(primitive.ObjectID)
+	if !ok {
+		return nil, fmt.Errorf("invalid inserted ID: %v", result.InsertedID)
+	}
+
 	return &models.Group{
 		ID:          insertedID,
 		Name:        data.Name,

@@ -13,6 +13,8 @@ import (
 )
 
 func TestGetSuccessByID(t *testing.T) {
+	t.Parallel()
+
 	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
 	defer mt.Close()
 
@@ -50,6 +52,8 @@ func TestGetSuccessByID(t *testing.T) {
 }
 
 func TestGetSuccessByHabitID(t *testing.T) {
+	t.Parallel()
+
 	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
 	defer mt.Close()
 
@@ -110,6 +114,8 @@ func TestGetSuccessByHabitID(t *testing.T) {
 }
 
 func TestCreateSuccess(t *testing.T) {
+	t.Parallel()
+
 	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
 	defer mt.Close()
 
@@ -127,11 +133,13 @@ func TestCreateSuccess(t *testing.T) {
 
 		response, err := dbw.CreateSuccess(data)
 		assert.Nil(t, err)
-		assert.NotEqual(t, response.ID.Hex(), "")
+		assert.NotEqual(t, "", response.ID.Hex())
 	})
 }
 
 func TestDeleteSuccessByID(t *testing.T) {
+	t.Parallel()
+
 	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
 	defer mt.Close()
 

@@ -12,6 +12,8 @@ import (
 )
 
 func TestGetGroupsByUserID(t *testing.T) {
+	t.Parallel()
+
 	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
 	defer mt.Close()
 
@@ -76,6 +78,8 @@ func TestGetGroupsByUserID(t *testing.T) {
 }
 
 func TestGetGroupByID(t *testing.T) {
+	t.Parallel()
+
 	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
 	defer mt.Close()
 
@@ -115,6 +119,8 @@ func TestGetGroupByID(t *testing.T) {
 }
 
 func TestCreateGroup(t *testing.T) {
+	t.Parallel()
+
 	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
 	defer mt.Close()
 
@@ -133,11 +139,13 @@ func TestCreateGroup(t *testing.T) {
 
 		response, err := dbw.CreateGroup(data)
 		assert.Nil(t, err)
-		assert.NotEqual(t, response.ID.Hex(), "")
+		assert.NotEqual(t, "", response.ID.Hex())
 	})
 }
 
 func TestUpdateGroup(t *testing.T) {
+	t.Parallel()
+
 	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
 	defer mt.Close()
 
@@ -183,6 +191,8 @@ func TestUpdateGroup(t *testing.T) {
 }
 
 func TestDeleteGroupByID(t *testing.T) {
+	t.Parallel()
+
 	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
 	defer mt.Close()
 

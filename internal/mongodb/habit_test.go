@@ -13,6 +13,8 @@ import (
 )
 
 func TestGetHabitByID(t *testing.T) {
+	t.Parallel()
+
 	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
 	defer mt.Close()
 
@@ -60,6 +62,8 @@ func TestGetHabitByID(t *testing.T) {
 }
 
 func TestGetHabitsByUserID(t *testing.T) {
+	t.Parallel()
+
 	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
 	defer mt.Close()
 
@@ -138,6 +142,8 @@ func TestGetHabitsByUserID(t *testing.T) {
 }
 
 func TestGetHabitsByGroupID(t *testing.T) {
+	t.Parallel()
+
 	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
 	defer mt.Close()
 
@@ -216,6 +222,8 @@ func TestGetHabitsByGroupID(t *testing.T) {
 }
 
 func TestCreateHabit(t *testing.T) {
+	t.Parallel()
+
 	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
 	defer mt.Close()
 
@@ -239,11 +247,13 @@ func TestCreateHabit(t *testing.T) {
 
 		response, err := dbw.CreateHabit(data)
 		assert.Nil(t, err)
-		assert.NotEqual(t, response.ID.Hex(), "")
+		assert.NotEqual(t, "", response.ID.Hex())
 	})
 }
 
 func TestUpdateHabit(t *testing.T) {
+	t.Parallel()
+
 	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
 	defer mt.Close()
 
@@ -304,6 +314,8 @@ func TestUpdateHabit(t *testing.T) {
 }
 
 func TestDeleteHabitByID(t *testing.T) {
+	t.Parallel()
+
 	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
 	defer mt.Close()
 

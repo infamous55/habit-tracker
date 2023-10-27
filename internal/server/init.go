@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"os"
 	"os/signal"
@@ -101,7 +102,7 @@ func Init() {
 	e.POST("/query", echo.WrapHandler(srv))
 
 	go func() {
-		if err := e.Start(":" + port); err != nil && err != http.ErrServerClosed {
+		if err := e.Start(":" + port); err != nil && errors.Is(err, http.ErrServerClosed) {
 			e.Logger.Fatal("shutting down the server")
 		}
 	}()
