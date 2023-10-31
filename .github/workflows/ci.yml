@@ -42,7 +42,7 @@ jobs:
         shell: bash
         run: |
           SHORT_SHA=$(echo $GITHUB_SHA | cut -c1-7)
-          echo "::set-output name=sha::$SHORT_SHA"
+          echo "sha=$SHORT_SHA" >> $GITHUB_OUTPUT
 
       - name: Publish Image to Digital Ocean Container Registry
         shell: bash
