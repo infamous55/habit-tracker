@@ -13,7 +13,6 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler/lru"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
-	"github.com/joho/godotenv"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 
@@ -55,10 +54,11 @@ func Init() {
 		AllowMethods: []string{http.MethodOptions, http.MethodGet, http.MethodPost},
 	}))
 
-	err := godotenv.Load()
-	if err != nil {
-		e.Logger.Fatal(err)
-	}
+	// load environment variables from .env file with godotenv
+	// err := godotenv.Load()
+	// if err != nil {
+	// 	e.Logger.Fatal(err)
+	// }
 
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -68,7 +68,7 @@ func Init() {
 	db := mongodb.Connect()
 	defer db.Disconnect()
 
-	err = setupIndexes(db)
+	err := setupIndexes(db)
 	if err != nil {
 		e.Logger.Fatal(err)
 	}
