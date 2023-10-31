@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 
 	"github.com/infamous55/habit-tracker/internal/ctxbridge"
 	"github.com/infamous55/habit-tracker/internal/models"

@@ -5,7 +5,7 @@ import (
 	"os"
 
 	gqlgen "github.com/99designs/gqlgen/graphql"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 )
 
 const (

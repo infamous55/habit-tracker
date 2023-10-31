@@ -3,8 +3,9 @@ package auth
 import (
 	"strings"
 
+	"github.com/labstack/echo/v4"
+
 	"github.com/infamous55/habit-tracker/internal/mongodb"
-	"github.com/labstack/echo"
 )
 
 const (
