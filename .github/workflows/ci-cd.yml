@@ -82,6 +82,7 @@ jobs:
         with:
           command: up
           stack-name: infamous55/habit-tracker/dev
+          work-dir: ./iac/
 
       - name: Deploy to DigitalOcean App Platform
         uses: digitalocean/app_action@v1.1.6
