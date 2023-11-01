@@ -1,0 +1,99 @@
+name: CI/CD pipeline
+
+on:
+  push:
+    branches: ["master"]
+  pull_request:
+    branches: ["master"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: "1.21.x"
+
+      - name: Install dependencies
+        run: go get -t ./...
+
+      - name: Build
+        run: go build -v ./...
+
+      - name: Test
+        run: go test -v ./...
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    outputs:
+      sha: ${{ steps.github-sha.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      - name: Generate GITHUB_SHA
+        id: github-sha
+        shell: bash
+        run: |
+          SHORT_SHA=$(echo $GITHUB_SHA | cut -c1-7)
+          echo "sha=$SHORT_SHA" >> $GITHUB_OUTPUT
+
+      - name: Publish Image to DigitalOcean Container Registry
+        shell: bash
+        run: |
+          doctl registry login --expiry-seconds 600
+          docker build . -t registry.digitalocean.com/infamous55/habit_tracker:${{steps.github-sha.outputs.sha}}
+          docker push registry.digitalocean.com/infamous55/habit_tracker:${{steps.github-sha.outputs.sha}}
+
+  deploy:
+    needs: publish
+    runs-on: ubuntu-latest
+    env:
+      APP_ENVIRONMENT: ${{ vars.APP_ENVIRONMENT }}
+      APP_PORT: ${{ vars.APP_PORT }}
+      APP_JWT_SECRET: ${{ secrets.APP_JWT_SECRET }}
+      APP_GRAPHQL_PLAYGROUND_PASSWORD: ${{ secrets.APP_GRAPHQL_PLAYGROUND_PASSWORD }}
+      APP_MONGODB_CONNECTION_STRING: ${{ secrets.APP_MONGODB_CONNECTION_STRING }}
+      APP_MONGODB_DATABASE_NAME: ${{ secrets.APP_MONGODB_DATABASE_NAME }}
+      PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: "1.21.x"
+
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      - uses: pulumi/actions@v4
+        id: pulumi
+        with:
+          command: up
+
+      - name: Deploy to DigitalOcean App Platform
+        uses: digitalocean/app_action@v1.1.6
+        with:
+          app_name: habit_tracker
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+          images: '[
+            {
+            "name": "${{ steps.pulumi.outputs.app_name }}",
+            "image": {
+            "registry_type": "DOCR",
+            "repository": "registry.digitalocean.com/infamous55/habit_tracker",
+            "tag": "${{ needs.publish.outputs.sha }}"
+            },
+            },
+            ]'
