@@ -81,6 +81,7 @@ jobs:
         id: pulumi
         with:
           command: up
+          stack-name: dev
 
       - name: Deploy to DigitalOcean App Platform
         uses: digitalocean/app_action@v1.1.6
