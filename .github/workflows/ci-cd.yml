@@ -81,7 +81,7 @@ jobs:
         id: pulumi
         with:
           command: up
-          stack-name: habit-tracker/dev
+          stack-name: infamous55/habit-tracker/dev
 
       - name: Deploy to DigitalOcean App Platform
         uses: digitalocean/app_action@v1.1.6
