@@ -63,6 +63,7 @@ jobs:
       APP_GRAPHQL_PLAYGROUND_PASSWORD: ${{ secrets.APP_GRAPHQL_PLAYGROUND_PASSWORD }}
       APP_MONGODB_CONNECTION_STRING: ${{ secrets.APP_MONGODB_CONNECTION_STRING }}
       APP_MONGODB_DATABASE_NAME: ${{ secrets.APP_MONGODB_DATABASE_NAME }}
+      SHA: ${{ needs.publish.outputs.sha }}
       PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
     steps:
       - uses: actions/checkout@v4
@@ -83,19 +84,3 @@ jobs:
           command: up
           stack-name: infamous55/habit-tracker/dev
           work-dir: ./iac/
-
-      - name: Deploy to DigitalOcean App Platform
-        uses: digitalocean/app_action@v1.1.6
-        with:
-          app_name: habit_tracker
-          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
-          images: '[
-            {
-            "name": "${{ steps.pulumi.outputs.app_name }}",
-            "image": {
-            "registry_type": "DOCR",
-            "repository": "registry.digitalocean.com/infamous55/habit_tracker",
-            "tag": "${{ needs.publish.outputs.sha }}"
-            },
-            },
-            ]'
