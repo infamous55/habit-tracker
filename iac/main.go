@@ -80,34 +80,33 @@ func main() {
 			return err
 		}
 
-		user, err := digitalocean.NewDatabaseUser(
-			ctx,
-			"mongodb-user",
-			&digitalocean.DatabaseUserArgs{
-				ClusterId: db.ID(),
-				Name:      pulumi.String("infamous55"),
-			},
-		)
+		// user, err := digitalocean.NewDatabaseUser(
+		// 	ctx,
+		// 	"mongodb-user",
+		// 	&digitalocean.DatabaseUserArgs{
+		// 		ClusterId: db.ID(),
+		// 		Name:      pulumi.String("infamous55"),
+		// 	},
+		// )
 
 		appSpecServiceEnvArgs = append(appSpecServiceEnvArgs, digitalocean.AppSpecServiceEnvArgs{
 			Key:   pulumi.String("MONGODB_CONNECTION_STRING"),
 			Type:  pulumi.String("SECRET"),
-			Value: pulumi.Sprintf("mongodb+srv://%s:%s@%s", user.Name, user.Password, db.Uri),
+			Value: db.Uri,
 		})
 
 		app, err := digitalocean.NewApp(ctx, "habit-tracker", &digitalocean.AppArgs{
 			Spec: &digitalocean.AppSpecArgs{
 				Name:   pulumi.String("habit-tracker"),
 				Region: pulumi.String("fra1"),
-				// Create a database as an app component
-				// Databases: digitalocean.AppSpecDatabaseArray{
-				//     &digitalocean.AppSpecDatabaseArgs{
-				//         DbUser: pulumi.String("infamous55"),
-				//         Engine: pulumi.String("MONGODB"),
-				//         Name: pulumi.String("mongodb"),
-				//         Production: pulumi.Bool(false),
-				//     },
-				// },
+				Databases: digitalocean.AppSpecDatabaseArray{
+					&digitalocean.AppSpecDatabaseArgs{
+						Name:        pulumi.String("mongodb"),
+						ClusterName: db.Name,
+						Engine:      pulumi.String("MONGODB"),
+						Production:  pulumi.Bool(false),
+					},
+				},
 				Services: digitalocean.AppSpecServiceArray{
 					&digitalocean.AppSpecServiceArgs{
 						Name:             pulumi.String("gql-api"),
@@ -130,13 +129,27 @@ func main() {
 			return err
 		}
 
+		trustedSource, err := digitalocean.NewDatabaseFirewall(
+			ctx,
+			"trusted-souce",
+			&digitalocean.DatabaseFirewallArgs{
+				ClusterId: db.ID(),
+				Rules: digitalocean.DatabaseFirewallRuleArray{
+					&digitalocean.DatabaseFirewallRuleArgs{
+						Type:  pulumi.String("app"),
+						Value: app.ID(),
+					},
+				},
+			},
+		)
+
 		ctx.Export("db_name", db.Name)
 		ctx.Export("db_uri", db.Uri)
-		ctx.Export("db_user", user.Name)
-		ctx.Export("db_password", user.Password)
 
 		ctx.Export("app_name", app.Spec.Name())
 		ctx.Export("app_url", app.LiveUrl)
+
+		ctx.Export("trusted_source", trustedSource)
 
 		return nil
 	})
