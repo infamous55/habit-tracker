@@ -12,8 +12,10 @@ type CustomContext struct {
 	ctx context.Context
 }
 
+type ContextKey string
+
 const (
-	EchoContextKey string = "echoContextKey"
+	EchoContextKey ContextKey = "echoContextKey"
 )
 
 func EchoContextToContext(next echo.HandlerFunc) echo.HandlerFunc {
