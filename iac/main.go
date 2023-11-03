@@ -104,7 +104,7 @@ func main() {
 						Name:        pulumi.String("mongodb"),
 						ClusterName: db.Name,
 						Engine:      pulumi.String("MONGODB"),
-						Production:  pulumi.Bool(false),
+						Production:  pulumi.Bool(true),
 					},
 				},
 				Services: digitalocean.AppSpecServiceArray{
