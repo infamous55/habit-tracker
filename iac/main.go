@@ -16,55 +16,60 @@ type EnvVar struct {
 }
 
 func main() {
-	envVars := []EnvVar{
-		{Key: "ENVIRONMENT", Type: "GENERAL"},
-		{Key: "JWT_SECRET", Type: "SECRET"},
-		{
-			Key:  "GRAPHQL_PLAYGROUND_PASSWORD",
-			Type: "SECRET",
-		},
-		{
-			Key:  "MONGODB_DATABASE_NAME",
-			Type: "SECRET",
-		},
-	}
-	for _, envVar := range envVars {
-		name := fmt.Sprintf("APP_%s", envVar.Key)
-		envVar.Value = os.Getenv(name)
-		if envVar.Value == "" {
-			panic("Please set the environment variable " + name)
-		}
-	}
-
-	appSpecServiceEnvArgs := make(digitalocean.AppSpecServiceEnvArray, len(envVars))
-	for i, envVar := range envVars {
-		key := pulumi.String(envVar.Key)
-		value := pulumi.String(envVar.Value)
-		envType := pulumi.String(envVar.Type)
-
-		envArg := digitalocean.AppSpecServiceEnvArgs{
-			Key:   key,
-			Type:  envType,
-			Value: value,
-		}
-		appSpecServiceEnvArgs[i] = envArg
-	}
-
-	sha := os.Getenv("SHA")
-	if sha == "" {
-		panic("Please set the environment variable SHA")
-	}
-
-	portString := os.Getenv("APP_PORT")
-	if portString == "" {
-		panic("Please set the environment variable APP_PORT")
-	}
-	port, err := strconv.Atoi(portString)
-	if err != nil {
-		panic("APP_PORT must be a number")
-	}
-
 	pulumi.Run(func(ctx *pulumi.Context) error {
+		envVars := []EnvVar{
+			{Key: "JWT_SECRET", Type: "SECRET"},
+			{
+				Key:  "GRAPHQL_PLAYGROUND_PASSWORD",
+				Type: "SECRET",
+			},
+			{
+				Key:  "MONGODB_DATABASE_NAME",
+				Type: "SECRET",
+			},
+		}
+		for _, envVar := range envVars {
+			name := fmt.Sprintf("APP_%s", envVar.Key)
+			envVar.Value = os.Getenv(name)
+			if envVar.Value == "" {
+				panic("Please set the environment variable " + name)
+			}
+		}
+
+		appSpecServiceEnvArgs := make(digitalocean.AppSpecServiceEnvArray, len(envVars))
+		for i, envVar := range envVars {
+			key := pulumi.String(envVar.Key)
+			value := pulumi.String(envVar.Value)
+			envType := pulumi.String(envVar.Type)
+
+			envArg := digitalocean.AppSpecServiceEnvArgs{
+				Key:   key,
+				Type:  envType,
+				Value: value,
+			}
+			appSpecServiceEnvArgs[i] = envArg
+		}
+
+		appSpecServiceEnvArgs = append(appSpecServiceEnvArgs, digitalocean.AppSpecServiceEnvArgs{
+			Key:   pulumi.String("ENVIRONMENT"),
+			Type:  pulumi.String("GENERAL"),
+			Value: pulumi.String("production"),
+		})
+
+		// sha := os.Getenv("SHA")
+		// if sha == "" {
+		// 	panic("Please set the environment variable SHA")
+		// }
+
+		portString := os.Getenv("APP_PORT")
+		if portString == "" {
+			panic("Please set the environment variable APP_PORT")
+		}
+		port, err := strconv.Atoi(portString)
+		if err != nil {
+			panic("APP_PORT must be a number")
+		}
+
 		db, err := digitalocean.NewDatabaseCluster(
 			ctx,
 			"mongodb",
@@ -74,25 +79,17 @@ func main() {
 				Size:      pulumi.String("db-s-1vcpu-1gb"),
 				NodeCount: pulumi.Int(1),
 				Engine:    pulumi.String("mongodb"),
+				Tags:      pulumi.ToStringArray([]string{"production"}),
 			},
 		)
 		if err != nil {
 			return err
 		}
 
-		// user, err := digitalocean.NewDatabaseUser(
-		// 	ctx,
-		// 	"mongodb-user",
-		// 	&digitalocean.DatabaseUserArgs{
-		// 		ClusterId: db.ID(),
-		// 		Name:      pulumi.String("infamous55"),
-		// 	},
-		// )
-
 		appSpecServiceEnvArgs = append(appSpecServiceEnvArgs, digitalocean.AppSpecServiceEnvArgs{
 			Key:   pulumi.String("MONGODB_CONNECTION_STRING"),
 			Type:  pulumi.String("SECRET"),
-			Value: db.Uri,
+			Value: pulumi.String("${db.DATABASE_URL}"),
 		})
 
 		app, err := digitalocean.NewApp(ctx, "habit-tracker", &digitalocean.AppArgs{
@@ -117,7 +114,7 @@ func main() {
 							Repository: pulumi.String(
 								"habit_tracker",
 							),
-							Tag: pulumi.String(sha),
+							Tag: pulumi.String("latest"),
 						},
 						Envs:     appSpecServiceEnvArgs,
 						HttpPort: pulumi.Int(port),
