@@ -86,7 +86,6 @@ jobs:
 
       - name: Refresh Pulumi state
         uses: pulumi/actions@v4
-        id: pulumi
         with:
           command: refresh
           stack-name: infamous55/habit-tracker/dev
