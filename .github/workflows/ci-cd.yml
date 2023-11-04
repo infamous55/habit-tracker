@@ -2,9 +2,9 @@ name: CI/CD pipeline
 
 on:
   push:
-    branches: ['master']
+    branches: ["master"]
   pull_request:
-    branches: ['master']
+    branches: ["master"]
 
 jobs:
   build:
@@ -15,7 +15,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version: '1.21.x'
+          go-version: "1.21.x"
 
       - name: Install dependencies
         run: go get -t ./...
@@ -34,8 +34,6 @@ jobs:
   publish:
     needs: build
     runs-on: ubuntu-latest
-    outputs:
-      sha: ${{ steps.github-sha.outputs.sha }}
     steps:
       - uses: actions/checkout@v4
 
@@ -55,8 +53,9 @@ jobs:
         shell: bash
         run: |
           doctl registry login --expiry-seconds 600
-          docker build . -t registry.digitalocean.com/infamous55/habit_tracker:${{steps.github-sha.outputs.sha}}
-          docker push registry.digitalocean.com/infamous55/habit_tracker:${{steps.github-sha.outputs.sha}}
+          docker build . -t registry.digitalocean.com/infamous55/habit_tracker:${{ steps.github-sha.outputs.sha }}
+          docker tag registry.digitalocean.com/infamous55/habit_tracker:${{ steps.github-sha.outputs.sha }} registry.digitalocean.com/infamous55/habit_tracker:latest
+          docker push registry.digitalocean.com/infamous55/habit_tracker:latest
 
   deploy:
     needs: publish
@@ -68,7 +67,6 @@ jobs:
       APP_GRAPHQL_PLAYGROUND_PASSWORD: ${{ secrets.APP_GRAPHQL_PLAYGROUND_PASSWORD }}
       APP_MONGODB_CONNECTION_STRING: ${{ secrets.APP_MONGODB_CONNECTION_STRING }}
       APP_MONGODB_DATABASE_NAME: ${{ secrets.APP_MONGODB_DATABASE_NAME }}
-      SHA: ${{ needs.publish.outputs.sha }}
       PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
     steps:
       - uses: actions/checkout@v4
@@ -76,15 +74,23 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version: '1.21.x'
+          go-version: "1.21.x"
 
       - name: Install dependencies
         run: go get -t ./...
-        
+
       - name: Install doctl
         uses: digitalocean/action-doctl@v2
         with:
           token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      - name: Refresh Pulumi state
+        uses: pulumi/actions@v4
+        id: pulumi
+        with:
+          command: refresh
+          stack-name: infamous55/habit-tracker/dev
+          work-dir: ./iac/
 
       - name: Update DigitalOcean resources with Pulumi
         uses: pulumi/actions@v4
