@@ -28,7 +28,8 @@ func main() {
 				Type: "SECRET",
 			},
 		}
-		for _, envVar := range envVars {
+		for i := range envVars {
+			envVar := &envVars[i]
 			name := fmt.Sprintf("APP_%s", envVar.Key)
 			envVar.Value = os.Getenv(name)
 			if envVar.Value == "" {
@@ -56,11 +57,6 @@ func main() {
 			Value: pulumi.String("production"),
 		})
 
-		// sha := os.Getenv("SHA")
-		// if sha == "" {
-		// 	panic("Please set the environment variable SHA")
-		// }
-
 		portString := os.Getenv("APP_PORT")
 		if portString == "" {
 			panic("Please set the environment variable APP_PORT")
@@ -79,7 +75,6 @@ func main() {
 				Size:      pulumi.String("db-s-1vcpu-1gb"),
 				NodeCount: pulumi.Int(1),
 				Engine:    pulumi.String("mongodb"),
-				Tags:      pulumi.ToStringArray([]string{"production"}),
 			},
 		)
 		if err != nil {
@@ -87,9 +82,16 @@ func main() {
 		}
 
 		appSpecServiceEnvArgs = append(appSpecServiceEnvArgs, digitalocean.AppSpecServiceEnvArgs{
-			Key:   pulumi.String("MONGODB_CONNECTION_STRING"),
-			Type:  pulumi.String("SECRET"),
-			Value: pulumi.String("${db.DATABASE_URL}"),
+			Key:  pulumi.String("MONGODB_CONNECTION_STRING"),
+			Type: pulumi.String("SECRET"),
+			Value: pulumi.Sprintf(
+				"mongodb+srv://%v:%v@%v/%v?replicaSet=%v&tls=true&authSource=admin",
+				db.User,
+				db.Password,
+				db.Host,
+				envVars[2].Value, // MONGODB_DATABASE_NAME
+				db.Name,
+			),
 		})
 
 		app, err := digitalocean.NewApp(ctx, "habit-tracker", &digitalocean.AppArgs{
@@ -115,6 +117,11 @@ func main() {
 								"habit_tracker",
 							),
 							Tag: pulumi.String("latest"),
+							DeployOnPushes: digitalocean.AppSpecServiceImageDeployOnPushArray{
+								digitalocean.AppSpecServiceImageDeployOnPushArgs{
+									Enabled: pulumi.Bool(true),
+								},
+							},
 						},
 						Envs:     appSpecServiceEnvArgs,
 						HttpPort: pulumi.Int(port),

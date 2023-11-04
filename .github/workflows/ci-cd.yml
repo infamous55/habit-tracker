@@ -61,11 +61,9 @@ jobs:
     needs: publish
     runs-on: ubuntu-latest
     env:
-      APP_ENVIRONMENT: ${{ vars.APP_ENVIRONMENT }}
       APP_PORT: ${{ vars.APP_PORT }}
       APP_JWT_SECRET: ${{ secrets.APP_JWT_SECRET }}
       APP_GRAPHQL_PLAYGROUND_PASSWORD: ${{ secrets.APP_GRAPHQL_PLAYGROUND_PASSWORD }}
-      APP_MONGODB_CONNECTION_STRING: ${{ secrets.APP_MONGODB_CONNECTION_STRING }}
       APP_MONGODB_DATABASE_NAME: ${{ secrets.APP_MONGODB_DATABASE_NAME }}
       PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
     steps:
@@ -86,6 +84,7 @@ jobs:
 
       - name: Refresh Pulumi state
         uses: pulumi/actions@v4
+        id: pulumi-refresh
         with:
           command: refresh
           stack-name: infamous55/habit-tracker/dev
@@ -93,7 +92,7 @@ jobs:
 
       - name: Update DigitalOcean resources with Pulumi
         uses: pulumi/actions@v4
-        id: pulumi
+        id: pulumi-update
         with:
           command: up
           stack-name: infamous55/habit-tracker/dev
