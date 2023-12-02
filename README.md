@@ -1,7 +1,8 @@
 # Habit Tracker
 
 ![GitHub go.mod Go version (branch & subdirectory of monorepo)](https://img.shields.io/github/go-mod/go-version/infamous55/habit-tracker/master?style=flat-square)
-![](https://tokei.rs/b1/github/infamous55/habit-tracker?style=flat-square)
+
+<!-- ![](https://tokei.rs/b1/github/infamous55/habit-tracker?style=flat-square) -->
 
 A GraphQL API for tracking your habits.
 
