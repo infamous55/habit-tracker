@@ -20,6 +20,7 @@ import (
 	"github.com/infamous55/habit-tracker/internal/ctxbridge"
 	"github.com/infamous55/habit-tracker/internal/graphql"
 	"github.com/infamous55/habit-tracker/internal/mongodb"
+	"github.com/infamous55/habit-tracker/internal/validator"
 )
 
 func setupIndexes(db mongodb.DatabaseWrapper) error {
@@ -64,6 +65,8 @@ func Init() {
 	if port == "" {
 		port = defaultPort
 	}
+
+	validator.Init()
 
 	db := mongodb.Connect()
 	defer db.Disconnect()
