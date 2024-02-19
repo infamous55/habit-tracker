@@ -16,7 +16,6 @@ func TestGetHabitByID(t *testing.T) {
 	t.Parallel()
 
 	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
-	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
 		dbw := DatabaseWrapper{mt.DB}
@@ -65,7 +64,6 @@ func TestGetHabitsByUserID(t *testing.T) {
 	t.Parallel()
 
 	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
-	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
 		dbw := DatabaseWrapper{mt.DB}
@@ -145,7 +143,6 @@ func TestGetHabitsByGroupID(t *testing.T) {
 	t.Parallel()
 
 	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
-	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
 		dbw := DatabaseWrapper{mt.DB}
@@ -225,7 +222,6 @@ func TestCreateHabit(t *testing.T) {
 	t.Parallel()
 
 	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
-	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
 		dbw := DatabaseWrapper{mt.DB}
@@ -255,7 +251,6 @@ func TestUpdateHabit(t *testing.T) {
 	t.Parallel()
 
 	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
-	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
 		dbw := DatabaseWrapper{mt.DB}
@@ -317,7 +312,6 @@ func TestDeleteHabitByID(t *testing.T) {
 	t.Parallel()
 
 	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
-	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
 		dbw := DatabaseWrapper{mt.DB}

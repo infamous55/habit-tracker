@@ -19,7 +19,6 @@ func TestExtractUserMiddleware(t *testing.T) {
 	t.Parallel()
 
 	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
-	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
 		userID := primitive.NewObjectID()

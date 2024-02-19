@@ -16,7 +16,6 @@ func TestGetSuccessByID(t *testing.T) {
 	t.Parallel()
 
 	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
-	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
 		dbw := DatabaseWrapper{mt.DB}
@@ -55,7 +54,6 @@ func TestGetSuccessByHabitID(t *testing.T) {
 	t.Parallel()
 
 	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
-	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
 		dbw := DatabaseWrapper{mt.DB}
@@ -117,7 +115,6 @@ func TestCreateSuccess(t *testing.T) {
 	t.Parallel()
 
 	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
-	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
 		dbw := DatabaseWrapper{mt.DB}
@@ -141,7 +138,6 @@ func TestDeleteSuccessByID(t *testing.T) {
 	t.Parallel()
 
 	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
-	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
 		dbw := DatabaseWrapper{mt.DB}

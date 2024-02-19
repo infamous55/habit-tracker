@@ -15,7 +15,6 @@ func TestGetGroupsByUserID(t *testing.T) {
 	t.Parallel()
 
 	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
-	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
 		dbw := DatabaseWrapper{mt.DB}
@@ -81,7 +80,6 @@ func TestGetGroupByID(t *testing.T) {
 	t.Parallel()
 
 	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
-	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
 		dbw := DatabaseWrapper{mt.DB}
@@ -122,7 +120,6 @@ func TestCreateGroup(t *testing.T) {
 	t.Parallel()
 
 	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
-	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
 		dbw := DatabaseWrapper{mt.DB}
@@ -147,7 +144,6 @@ func TestUpdateGroup(t *testing.T) {
 	t.Parallel()
 
 	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
-	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
 		dbw := DatabaseWrapper{mt.DB}
@@ -194,7 +190,6 @@ func TestDeleteGroupByID(t *testing.T) {
 	t.Parallel()
 
 	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
-	defer mt.Close()
 
 	mt.Run("success", func(mt *mtest.T) {
 		dbw := DatabaseWrapper{mt.DB}
